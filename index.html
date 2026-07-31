@@ -6,19 +6,13 @@
     <title>漢字 · Каллиграфия</title>
 
     <!-- PWA: Мета-теги -->
-    <meta name="description" content="Тренажёр китайской каллиграфии — учись писать иероглифы правильно">
+    <meta name="description" content="Тренажёр китайской каллиграфии с озвучкой и распознаванием черт">
     <meta name="theme-color" content="#1e1a17">
-    
-    <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="漢字">
     <link rel="apple-touch-icon" href="icon.svg">
-
-    <!-- Android PWA -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- Иконки -->
     <link rel="icon" type="image/svg+xml" href="icon.svg">
 
     <!-- Шрифты и библиотека -->
@@ -64,7 +58,7 @@
             position: relative;
         }
 
-        /* Верхняя панель */
+        /* Верхняя панель (кликабельная для озвучки) */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -76,12 +70,31 @@
             align-items: center;
             gap: 0.6rem;
             flex: 1;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            position: relative;
+            padding: 0.2rem;
+            border-radius: 1rem;
         }
+        .char-info:active {
+            transform: scale(0.96);
+            background: rgba(0,0,0,0.03);
+        }
+        .char-info::after {
+            content: '🔊';
+            font-size: 1rem;
+            opacity: 0.4;
+            margin-left: 0.3rem;
+            transition: opacity 0.2s;
+        }
+        .char-info:hover::after { opacity: 0.8; }
+
         .char-main {
             font-family: 'Ma Shan Zheng', cursive;
             font-size: clamp(2rem, 7vw, 3rem);
             color: var(--ink-color);
             line-height: 1;
+            transition: color 0.3s;
         }
         .char-meta {
             display: flex;
@@ -213,27 +226,15 @@
             align-items: center;
             gap: 0.4rem;
         }
-        .btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 0px 0 #aa9884;
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
+        .btn:active { transform: translateY(4px); box-shadow: 0 0px 0 #aa9884; }
+        .btn:disabled { opacity: 0.5; pointer-events: none; }
         .btn-primary { background: #c9b39b; box-shadow: 0 4px 0 #8e7b66; }
-        .btn-hint { 
-            background: #8fb88a; 
-            color: #1f2a1c; 
-            box-shadow: 0 4px 0 #5f7a5a; 
-            flex: 0.6;
-        }
+        .btn-hint { background: #8fb88a; color: #1f2a1c; box-shadow: 0 4px 0 #5f7a5a; flex: 0.6; }
 
         /* Всплывающий текст */
         .floating-text {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0.5);
             font-size: clamp(1.5rem, 5vw, 2rem);
             font-weight: 800;
@@ -244,9 +245,7 @@
             z-index: 100;
             white-space: nowrap;
         }
-        .floating-text.show {
-            animation: floatUp 1s ease-out forwards;
-        }
+        .floating-text.show { animation: floatUp 1s ease-out forwards; }
         @keyframes floatUp {
             0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
             20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
@@ -255,241 +254,88 @@
 
         /* Модальное окно */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 1rem;
-            backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; padding: 1rem; backdrop-filter: blur(4px);
         }
         .modal-overlay.show { display: flex; }
         .modal {
             background: var(--paper-color);
             border-radius: 1.5rem;
             padding: 1.2rem;
-            max-width: 420px;
-            width: 100%;
+            max-width: 420px; width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             max-height: 85vh;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
-        .modal h2 {
-            font-size: 1.2rem;
-            color: var(--ink-color);
-            margin-bottom: 0.8rem;
-            text-align: center;
-        }
+        .modal h2 { font-size: 1.2rem; color: var(--ink-color); margin-bottom: 0.8rem; text-align: center; }
 
-        /* === ПОИСК === */
-        .search-wrapper {
-            position: relative;
-            margin-bottom: 0.8rem;
-        }
+        /* Поиск */
+        .search-wrapper { position: relative; margin-bottom: 0.8rem; }
         .search-input {
-            width: 100%;
-            padding: 0.7rem 2.5rem 0.7rem 2.5rem;
-            font-size: 0.95rem;
-            font-family: inherit;
-            background: #fcf8f0;
-            border: 2px solid #d6c4b0;
-            border-radius: 1rem;
-            color: var(--ink-color);
-            outline: none;
-            transition: all 0.2s;
+            width: 100%; padding: 0.7rem 2.5rem 0.7rem 2.5rem;
+            font-size: 0.95rem; font-family: inherit;
+            background: #fcf8f0; border: 2px solid #d6c4b0;
+            border-radius: 1rem; color: var(--ink-color);
+            outline: none; transition: all 0.2s;
         }
-        .search-input:focus {
-            border-color: var(--accent-gold);
-            background: #fff;
-            box-shadow: 0 0 0 3px rgba(212, 168, 64, 0.15);
-        }
-        .search-input::placeholder {
-            color: #a09080;
-        }
-        .search-icon {
-            position: absolute;
-            left: 0.9rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.1rem;
-            pointer-events: none;
-            opacity: 0.6;
-        }
+        .search-input:focus { border-color: var(--accent-gold); background: #fff; box-shadow: 0 0 0 3px rgba(212, 168, 64, 0.15); }
+        .search-input::placeholder { color: #a09080; }
+        .search-icon { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; opacity: 0.6; }
         .search-clear {
-            position: absolute;
-            right: 0.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #d6c4b0;
-            border: none;
-            border-radius: 50%;
-            width: 1.8rem;
-            height: 1.8rem;
-            font-size: 0.9rem;
-            color: var(--ink-color);
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
+            position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%);
+            background: #d6c4b0; border: none; border-radius: 50%;
+            width: 1.8rem; height: 1.8rem; font-size: 0.9rem;
+            color: var(--ink-color); cursor: pointer;
+            display: none; align-items: center; justify-content: center;
         }
-        .search-clear:hover { background: #c4b098; }
         .search-clear.visible { display: flex; }
 
-        /* Список категорий и результатов */
-        .modal-scroll {
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 0.3rem;
-        }
+        .modal-scroll { overflow-y: auto; flex: 1; padding-right: 0.3rem; }
         .modal-scroll::-webkit-scrollbar { width: 6px; }
         .modal-scroll::-webkit-scrollbar-track { background: transparent; }
         .modal-scroll::-webkit-scrollbar-thumb { background: #d6c4b0; border-radius: 3px; }
 
-        .group-header {
-            font-size: 0.8rem;
-            color: #6a5a4a;
-            padding: 0.5rem 0.3rem 0.3rem;
-            margin-top: 0.5rem;
-            border-bottom: 1px dashed #d6c4b0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .group-header { font-size: 0.8rem; color: #6a5a4a; padding: 0.5rem 0.3rem 0.3rem; margin-top: 0.5rem; border-bottom: 1px dashed #d6c4b0; text-transform: uppercase; letter-spacing: 0.5px; }
         .group-header:first-child { margin-top: 0; }
-
-        .category-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        .category-list { display: flex; flex-direction: column; gap: 0.5rem; }
         .category-item {
-            background: #ede3d6;
-            border: 2px solid transparent;
-            border-radius: 1rem;
-            padding: 0.7rem 0.9rem;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
+            background: #ede3d6; border: 2px solid transparent; border-radius: 1rem;
+            padding: 0.7rem 0.9rem; cursor: pointer; transition: all 0.15s;
+            text-align: left; display: flex; align-items: center; gap: 0.6rem;
         }
         .category-item:active { transform: scale(0.98); }
-        .category-item.active {
-            border-color: var(--accent-gold);
-            background: #f5ead8;
-        }
-        .cat-color-bar {
-            width: 4px;
-            height: 36px;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
+        .category-item.active { border-color: var(--accent-gold); background: #f5ead8; }
+        .cat-color-bar { width: 4px; height: 36px; border-radius: 2px; flex-shrink: 0; }
         .category-item-content { flex: 1; }
-        .category-item-name {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--ink-color);
-        }
-        .category-item-desc {
-            font-size: 0.78rem;
-            color: #6a5a4a;
-            margin-top: 0.15rem;
-        }
+        .category-item-name { font-weight: 700; font-size: 1rem; color: var(--ink-color); }
+        .category-item-desc { font-size: 0.78rem; color: #6a5a4a; margin-top: 0.15rem; }
 
         /* Результаты поиска */
-        .search-results {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
+        .search-results { display: flex; flex-direction: column; gap: 0.4rem; }
         .search-result-item {
-            background: #fcf8f0;
-            border: 1px solid #e0d4c0;
-            border-radius: 0.9rem;
-            padding: 0.6rem 0.8rem;
-            cursor: pointer;
-            transition: all 0.15s;
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
+            background: #fcf8f0; border: 1px solid #e0d4c0; border-radius: 0.9rem;
+            padding: 0.6rem 0.8rem; cursor: pointer; transition: all 0.15s;
+            display: flex; align-items: center; gap: 0.7rem;
         }
-        .search-result-item:active {
-            transform: scale(0.98);
-            background: #f5ead8;
-        }
-        .search-result-char {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 2rem;
-            color: var(--ink-color);
-            line-height: 1;
-            min-width: 2.2rem;
-            text-align: center;
-        }
-        .search-result-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.1rem;
-        }
-        .search-result-pinyin {
-            font-weight: 700;
-            color: #8a4a2a;
-            font-size: 0.9rem;
-        }
-        .search-result-meaning {
-            color: #4a6a4a;
-            font-size: 0.82rem;
-        }
-        .search-result-category {
-            font-size: 0.7rem;
-            color: #8a7a6a;
-            background: #ede3d6;
-            padding: 0.15rem 0.5rem;
-            border-radius: 0.5rem;
-            align-self: flex-start;
-            margin-top: 0.2rem;
-        }
-        .search-empty {
-            text-align: center;
-            padding: 1.5rem 1rem;
-            color: #8a7a6a;
-            font-size: 0.9rem;
-        }
-        .search-count {
-            font-size: 0.75rem;
-            color: #8a7a6a;
-            text-align: center;
-            padding: 0.3rem;
-        }
+        .search-result-item:active { transform: scale(0.98); background: #f5ead8; }
+        .search-result-char { font-family: 'Ma Shan Zheng', cursive; font-size: 2rem; color: var(--ink-color); line-height: 1; min-width: 2.2rem; text-align: center; }
+        .search-result-info { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; }
+        .search-result-pinyin { font-weight: 700; color: #8a4a2a; font-size: 0.9rem; }
+        .search-result-meaning { color: #4a6a4a; font-size: 0.82rem; }
+        .search-result-category { font-size: 0.7rem; color: #8a7a6a; background: #ede3d6; padding: 0.15rem 0.5rem; border-radius: 0.5rem; align-self: flex-start; margin-top: 0.2rem; }
+        .search-empty { text-align: center; padding: 1.5rem 1rem; color: #8a7a6a; font-size: 0.9rem; }
+        .search-count { font-size: 0.75rem; color: #8a7a6a; text-align: center; padding: 0.3rem; }
 
         .modal-close {
-            margin-top: 0.8rem;
-            width: 100%;
-            background: #c9b39b;
-            border: none;
-            border-radius: 1rem;
-            padding: 0.7rem;
-            font-weight: 700;
-            color: var(--ink-color);
-            box-shadow: 0 4px 0 #8e7b66;
-            cursor: pointer;
-            flex-shrink: 0;
+            margin-top: 0.8rem; width: 100%; background: #c9b39b; border: none;
+            border-radius: 1rem; padding: 0.7rem; font-weight: 700; color: var(--ink-color);
+            box-shadow: 0 4px 0 #8e7b66; cursor: pointer; flex-shrink: 0;
         }
-        .modal-close:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #8e7b66;
-        }
+        .modal-close:active { transform: translateY(4px); box-shadow: 0 0 0 #8e7b66; }
 
-        /* Салют */
-        .firework-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 999; overflow: hidden;
-        }
-
+        .firework-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
         @media (max-width: 400px) {
             .modal { padding: 1rem; }
             .search-result-char { font-size: 1.7rem; min-width: 1.8rem; }
@@ -500,7 +346,8 @@
 
 <div class="game-container">
     <div class="top-bar">
-        <div class="char-info">
+        <!-- Кликабельная область для озвучки -->
+        <div class="char-info" id="charInfo">
             <div class="char-main" id="charDisplay">永</div>
             <div class="char-meta">
                 <span class="pinyin" id="pinyinDisplay">yǒng</span>
@@ -532,32 +379,19 @@
     </div>
 </div>
 
-<!-- Модальное окно с поиском и категориями -->
+<!-- Модальное окно -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <h2>📚 Иероглифы</h2>
-        
-        <!-- Строка поиска -->
         <div class="search-wrapper">
             <span class="search-icon">🔍</span>
-            <input 
-                type="text" 
-                id="searchInput" 
-                class="search-input" 
-                placeholder="Поиск: 水, shuǐ, вода..."
-                autocomplete="off"
-                autocapitalize="off"
-                spellcheck="false"
-            >
+            <input type="text" id="searchInput" class="search-input" placeholder="Поиск: 水, shuǐ, вода..." autocomplete="off" autocapitalize="off" spellcheck="false">
             <button class="search-clear" id="searchClear" title="Очистить">✕</button>
         </div>
-
-        <!-- Контент (категории или результаты поиска) -->
         <div class="modal-scroll" id="modalScroll">
             <div id="categoriesView"></div>
             <div id="searchView" style="display:none;"></div>
         </div>
-
         <button class="modal-close" id="modalClose">Закрыть</button>
     </div>
 </div>
@@ -576,9 +410,10 @@
     let hwWriter = null;
     let audioCtx = null;
     let isShowingHint = false;
-    let isSingleMode = false; // Режим одиночного иероглифа (из поиска)
+    let isSingleMode = false;
 
     // === DOM ===
+    const charInfo = document.getElementById('charInfo');
     const charDisplay = document.getElementById('charDisplay');
     const pinyinDisplay = document.getElementById('pinyinDisplay');
     const meaningDisplay = document.getElementById('meaningDisplay');
@@ -597,21 +432,17 @@
     const searchClear = document.getElementById('searchClear');
     const hintBtn = document.getElementById('hintBtn');
 
-    // === АУДИО ===
+    // === АУДИО И ОЗВУЧКА ===
     function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
     function playSound(type) {
         initAudio();
         const now = audioCtx.currentTime;
-        
         if (type === 'success') {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.type = 'sine';
             osc.frequency.setValueAtTime(523.25, now);
@@ -620,8 +451,7 @@
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
         } else if (type === 'error') {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(150, now);
@@ -631,8 +461,7 @@
             osc.start(now); osc.stop(now + 0.2);
         } else if (type === 'complete') {
             [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-                const o = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
                 o.connect(g); g.connect(audioCtx.destination);
                 o.type = 'sine'; o.frequency.value = freq;
                 g.gain.setValueAtTime(0.2, now + i * 0.1);
@@ -642,6 +471,33 @@
         }
     }
 
+    // 🔊 НОВАЯ ФУНКЦИЯ: Озвучка иероглифа и перевода
+    function speakCharacter(char, meaning) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+
+        const queue = [
+            { text: char, lang: 'zh-CN', rate: 0.7 },  // Медленно и чётко
+            { text: char, lang: 'zh-CN', rate: 0.7 },  // Повтор
+            { text: meaning, lang: 'ru-RU', rate: 1.0 } // Перевод
+        ];
+        let index = 0;
+
+        function speakNext() {
+            if (index >= queue.length) return;
+            const item = queue[index];
+            const utterance = new SpeechSynthesisUtterance(item.text);
+            utterance.lang = item.lang;
+            utterance.rate = item.rate;
+            utterance.volume = 1.0;
+
+            utterance.onend = () => { index++; setTimeout(speakNext, 400); };
+            utterance.onerror = () => { index++; setTimeout(speakNext, 400); };
+            window.speechSynthesis.speak(utterance);
+        }
+        speakNext();
+    }
+
     // === ВИЗУАЛЬНЫЕ ЭФФЕКТЫ ===
     function showFloatingText(text) {
         floatingText.textContent = text;
@@ -649,39 +505,30 @@
         void floatingText.offsetWidth;
         floatingText.classList.add('show');
     }
-
     function triggerShake() {
         writerWrapper.classList.add('shake');
         setTimeout(() => writerWrapper.classList.remove('shake'), 400);
     }
-
     function launchFirework() {
         const container = document.getElementById('fireworkContainer');
         const colors = ['#FFD166', '#FF6B6B', '#4ECDC4', '#FF9F1C', '#B980F0'];
         for (let i = 0; i < 40; i++) {
             const el = document.createElement('div');
             const size = 6 + Math.random() * 10;
-            const x = 20 + Math.random() * 60;
-            const y = 20 + Math.random() * 60;
+            const x = 20 + Math.random() * 60, y = 20 + Math.random() * 60;
             const color = colors[Math.floor(Math.random() * colors.length)];
-            el.style.cssText = `
-                position: absolute; left: ${x}%; top: ${y}%;
-                width: ${size}px; height: ${size}px; background: ${color};
-                border-radius: 50%; pointer-events: none;
-                animation: fireworkBurst ${0.6 + Math.random() * 0.5}s ease-out forwards;
-            `;
+            el.style.cssText = `position: absolute; left: ${x}%; top: ${y}%; width: ${size}px; height: ${size}px; background: ${color}; border-radius: 50%; pointer-events: none; animation: fireworkBurst ${0.6 + Math.random() * 0.5}s ease-out forwards;`;
             container.appendChild(el);
             setTimeout(() => el.remove(), 1200);
         }
     }
 
-    // === РАЗМЕР ===
+    // === РАЗМЕР И ЗАГРУЗКА ===
     function getWriterSize() {
         const rect = hwContainer.getBoundingClientRect();
         return Math.max(200, Math.floor(Math.min(rect.width, rect.height)));
     }
 
-    // === ЗАГРУЗКА ИЕРОГЛИФА ===
     function loadCharacter(index) {
         if (currentItems.length === 0) return;
         const data = currentItems[index];
@@ -706,8 +553,9 @@
             height: size,
             padding: 15,
             showOutline: true,
-            strokeAnimationSpeed: 2.5,
-            delayBetweenStrokes: 200,
+            // 🐌 МЕДЛЕННАЯ И ПЛАВНАЯ АНИМАЦИЯ ДЛЯ ОБУЧЕНИЯ
+            strokeAnimationSpeed: 1.2,   // Было 2.5
+            delayBetweenStrokes: 500,    // Было 200
             drawingWidth: Math.max(15, size * 0.06),
             showCharacter: false,
             highlightColor: '#FF3B30',
@@ -751,8 +599,7 @@
                 showFloatingText(accuracy === 100 ? '💯 Идеально!' : `✅ Готово! (${accuracy}%)`);
                 
                 if (isSingleMode) {
-                    // В режиме поиска — просто ждём следующего нажатия
-                    instructionText.textContent = "🎉 Готово! Выберите следующий иероглиф";
+                    instructionText.textContent = "🎉 Готово! Нажмите ⏭️ для выбора следующего";
                     instructionText.style.color = "#4a6a4a";
                 } else {
                     instructionText.textContent = "🎉 Отлично! Загрузка следующего...";
@@ -768,13 +615,15 @@
         comboDisplay.textContent = combo;
         comboBadge.classList.toggle('active', combo >= 2);
     }
-
-    function updateProgress(percent) {
-        progressFill.style.width = `${Math.min(percent, 100)}%`;
-    }
-
+    function updateProgress(percent) { progressFill.style.width = `${Math.min(percent, 100)}%`; }
+    
     function nextCharacter() {
-        if (isSingleMode) return; // В режиме поиска не переключаем автоматически
+        if (isSingleMode) {
+            updateCategoryList();
+            modalOverlay.classList.add('show');
+            setTimeout(() => searchInput.focus(), 100);
+            return;
+        }
         currentIndex = (currentIndex + 1) % currentItems.length;
         loadCharacter(currentIndex);
     }
@@ -790,7 +639,6 @@
         localStorage.removeItem('hanzi_single_mode');
     }
 
-    // === ЗАГРУЗКА ОДНОГО ИЕРОГЛИФА (из поиска) ===
     function loadSingleChar(charData) {
         currentCategory = null;
         currentItems = [charData];
@@ -801,16 +649,20 @@
         localStorage.removeItem('hanzi_category');
     }
 
-    // === ПОДСКАЗКА ===
+    // === ПОДСКАЗКА (с озвучкой) ===
     function showHint() {
         if (!hwWriter || isShowingHint) return;
-        
         initAudio();
+        
+        // 🔊 Озвучиваем при показе подсказки
+        if (currentItems.length > 0) {
+            const data = currentItems[currentIndex];
+            speakCharacter(data.char, data.meaning);
+        }
+        
         isShowingHint = true;
-        
-        instructionText.textContent = "👀 Смотрите анимацию...";
+        instructionText.textContent = "👀 Смотрите анимацию и слушайте...";
         instructionText.style.color = "#8a4a2a";
-        
         hintBtn.disabled = true;
         hintBtn.style.opacity = '0.5';
         
@@ -829,45 +681,30 @@
     function performSearch(query) {
         query = query.trim().toLowerCase();
         searchView.innerHTML = '';
-        
         if (!query) {
             searchView.style.display = 'none';
             categoriesView.style.display = 'block';
             searchClear.classList.remove('visible');
             return;
         }
-        
         searchClear.classList.add('visible');
         categoriesView.style.display = 'none';
         searchView.style.display = 'block';
         
         const results = HanziDB.search(query);
-        
         if (results.length === 0) {
-            searchView.innerHTML = `
-                <div class="search-empty">
-                    🔍 Ничего не найдено по запросу «${escapeHtml(query)}»<br>
-                    <span style="font-size:0.8rem;opacity:0.7;">Попробуйте: иероглиф, пиньинь или перевод</span>
-                </div>
-            `;
+            searchView.innerHTML = `<div class="search-empty">🔍 Ничего не найдено по запросу «${escapeHtml(query)}»<br><span style="font-size:0.8rem;opacity:0.7;">Попробуйте: иероглиф, пиньинь или перевод</span></div>`;
             return;
         }
         
-        // Ограничим до 50 результатов для производительности
         const limited = results.slice(0, 50);
-        
-        // Заголовок с количеством
         const countDiv = document.createElement('div');
         countDiv.className = 'search-count';
-        countDiv.textContent = results.length > 50 
-            ? `Найдено ${results.length} · показано первые 50` 
-            : `Найдено: ${results.length}`;
+        countDiv.textContent = results.length > 50 ? `Найдено ${results.length} · показано первые 50` : `Найдено: ${results.length}`;
         searchView.appendChild(countDiv);
         
-        // Список результатов
         const list = document.createElement('div');
         list.className = 'search-results';
-        
         limited.forEach(item => {
             const el = document.createElement('div');
             el.className = 'search-result-item';
@@ -884,10 +721,11 @@
                 modalOverlay.classList.remove('show');
                 loadSingleChar(item);
                 showFloatingText(`📖 ${item.char} · ${item.pinyin}`);
+                // Автоматически озвучиваем при выборе из поиска
+                setTimeout(() => speakCharacter(item.char, item.meaning), 300);
             });
             list.appendChild(el);
         });
-        
         searchView.appendChild(list);
     }
 
@@ -901,34 +739,22 @@
     function updateCategoryList() {
         categoriesView.innerHTML = '';
         const groups = HanziDB.getCategoriesByGroup();
-        
-        // Уровни HSK
         if (groups.hsk.length > 0) {
             const hskHeader = document.createElement('div');
             hskHeader.className = 'group-header';
             hskHeader.innerHTML = '🎯 <strong>Уровни HSK</strong> <span style="opacity:0.6;font-size:0.75rem;">комплексно</span>';
             categoriesView.appendChild(hskHeader);
-            
-            const list = document.createElement('div');
-            list.className = 'category-list';
-            groups.hsk.forEach(cat => {
-                list.appendChild(createCategoryItem(cat));
-            });
+            const list = document.createElement('div'); list.className = 'category-list';
+            groups.hsk.forEach(cat => list.appendChild(createCategoryItem(cat)));
             categoriesView.appendChild(list);
         }
-        
-        // Тематические
         if (groups.topic.length > 0) {
             const topicHeader = document.createElement('div');
             topicHeader.className = 'group-header';
             topicHeader.innerHTML = '📚 <strong>Тематические</strong> <span style="opacity:0.6;font-size:0.75rem;">по темам</span>';
             categoriesView.appendChild(topicHeader);
-            
-            const list = document.createElement('div');
-            list.className = 'category-list';
-            groups.topic.forEach(cat => {
-                list.appendChild(createCategoryItem(cat));
-            });
+            const list = document.createElement('div'); list.className = 'category-list';
+            groups.topic.forEach(cat => list.appendChild(createCategoryItem(cat)));
             categoriesView.appendChild(list);
         }
     }
@@ -936,16 +762,8 @@
     function createCategoryItem(cat) {
         const item = document.createElement('div');
         item.className = 'category-item' + (cat.key === currentCategory ? ' active' : '');
-        
         const colorBar = cat.color ? `<span class="cat-color-bar" style="background:${cat.color}"></span>` : '';
-        
-        item.innerHTML = `
-            ${colorBar}
-            <div class="category-item-content">
-                <div class="category-item-name">${cat.name}</div>
-                <div class="category-item-desc">${cat.description} · <strong>${cat.count}</strong> иероглифов</div>
-            </div>
-        `;
+        item.innerHTML = `${colorBar}<div class="category-item-content"><div class="category-item-name">${cat.name}</div><div class="category-item-desc">${cat.description} · <strong>${cat.count}</strong> иероглифов</div></div>`;
         item.addEventListener('click', () => {
             loadCategory(cat.key);
             modalOverlay.classList.remove('show');
@@ -956,18 +774,18 @@
     }
 
     // === ОБРАБОТЧИКИ ===
-    document.getElementById('nextBtn').addEventListener('click', () => { 
-        initAudio(); 
-        if (isSingleMode) {
-            // В режиме поиска — открываем меню для выбора следующего
-            updateCategoryList();
-            modalOverlay.classList.add('show');
-            setTimeout(() => searchInput.focus(), 100);
-        } else {
-            nextCharacter();
+    // 🔊 Клик по иероглифу для озвучки
+    charInfo.addEventListener('click', () => {
+        initAudio();
+        if (currentItems.length > 0) {
+            const data = currentItems[currentIndex];
+            speakCharacter(data.char, data.meaning);
+            charDisplay.style.color = '#8a4a2a';
+            setTimeout(() => { charDisplay.style.color = ''; }, 600);
         }
     });
-    
+
+    document.getElementById('nextBtn').addEventListener('click', () => { initAudio(); nextCharacter(); });
     hintBtn.addEventListener('click', () => { initAudio(); showHint(); });
     
     document.getElementById('categoryBtn').addEventListener('click', () => {
@@ -990,18 +808,9 @@
         }
     });
 
-    // Поиск в реальном времени
-    searchInput.addEventListener('input', (e) => {
-        performSearch(e.target.value);
-    });
+    searchInput.addEventListener('input', (e) => performSearch(e.target.value));
+    searchClear.addEventListener('click', () => { searchInput.value = ''; performSearch(''); searchInput.focus(); });
     
-    searchClear.addEventListener('click', () => {
-        searchInput.value = '';
-        performSearch('');
-        searchInput.focus();
-    });
-
-    // Закрытие модалки по Escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modalOverlay.classList.contains('show')) {
             modalOverlay.classList.remove('show');
@@ -1018,32 +827,21 @@
         }, 200);
     });
 
-    // CSS для салюта
     const styleSheet = document.createElement("style");
     styleSheet.textContent = `@keyframes fireworkBurst { 0% { transform: scale(0); opacity: 1; } 50% { opacity: 1; } 100% { transform: scale(3); opacity: 0; } }`;
     document.head.appendChild(styleSheet);
 
-    // === SERVICE WORKER ===
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('✅ SW зарегистрирован'))
-                .catch(err => console.log('❌ SW ошибка:', err));
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW ошибка:', err));
         });
     }
 
     // === СТАРТ ===
-    // Восстановление состояния
     const savedSingle = localStorage.getItem('hanzi_single_mode');
     const savedCategory = localStorage.getItem('hanzi_category');
-    
     if (savedSingle) {
-        try {
-            const charData = JSON.parse(savedSingle);
-            loadSingleChar(charData);
-        } catch(e) {
-            loadCategory('basic');
-        }
+        try { loadSingleChar(JSON.parse(savedSingle)); } catch(e) { loadCategory('basic'); }
     } else if (savedCategory && HANZI_DATABASE[savedCategory]) {
         loadCategory(savedCategory);
     } else {
