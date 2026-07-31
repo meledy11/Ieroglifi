@@ -993,9 +993,11 @@ const HanziDB = {
         }
         return all;
     },
+    
     getCategory: function(categoryKey) {
         return HANZI_DATABASE[categoryKey]?.items || [];
     },
+    
     getCategories: function() {
         return Object.keys(HANZI_DATABASE).map(key => ({
             key,
@@ -1006,6 +1008,7 @@ const HanziDB = {
             count: HANZI_DATABASE[key].items.length
         }));
     },
+    
     getCategoriesByGroup: function() {
         const groups = { hsk: [], topic: [] };
         for (const key in HANZI_DATABASE) {
@@ -1021,6 +1024,46 @@ const HanziDB = {
         }
         return groups;
     },
+
+    // 🔍 ПОИСК (добавлено)
+    search: function(query) {
+        if (!query) return [];
+        const q = query.trim().toLowerCase();
+        const results = [];
+        const seen = new Set(); // для удаления дубликатов
+        
+        for (const catKey in HANZI_DATABASE) {
+            const cat = HANZI_DATABASE[catKey];
+            cat.items.forEach(item => {
+                const uid = item.char + '|' + item.pinyin;
+                if (seen.has(uid)) return;
+                
+                const matchesChar = item.char.includes(q);
+                const matchesPinyin = item.pinyin.toLowerCase().includes(q);
+                const matchesMeaning = item.meaning.toLowerCase().includes(q);
+                
+                if (matchesChar || matchesPinyin || matchesMeaning) {
+                    let priority = 0;
+                    if (item.char === q) priority = 3;
+                    else if (matchesChar) priority = 2;
+                    else if (item.pinyin.toLowerCase() === q) priority = 2;
+                    else if (matchesPinyin) priority = 1;
+                    
+                    results.push({ ...item, category: catKey, priority });
+                    seen.add(uid);
+                }
+            });
+        }
+        
+        // Сортировка: по приоритету, затем по алфавиту пиньиня
+        results.sort((a, b) => {
+            if (b.priority !== a.priority) return b.priority - a.priority;
+            return a.pinyin.localeCompare(b.pinyin);
+        });
+        
+        return results;
+    },
+
     shuffle: function(array) {
         const arr = [...array];
         for (let i = arr.length - 1; i > 0; i--) {
@@ -1029,12 +1072,14 @@ const HanziDB = {
         }
         return arr;
     },
+    
     getRandomFromCategory: function(categoryKey, excludeChar = null) {
         const items = this.getCategory(categoryKey);
         const filtered = excludeChar ? items.filter(i => i.char !== excludeChar) : items;
         if (filtered.length === 0) return items[0];
         return filtered[Math.floor(Math.random() * filtered.length)];
     },
+    
     findByChar: function(char) {
         for (const key in HANZI_DATABASE) {
             const found = HANZI_DATABASE[key].items.find(i => i.char === char);
@@ -1042,15 +1087,23 @@ const HanziDB = {
         }
         return null;
     },
+    
     getStats: function() {
         const categories = this.getCategories();
         const total = categories.reduce((sum, c) => sum + c.count, 0);
         const hsk = categories.filter(c => c.group === 'hsk').reduce((s, c) => s + c.count, 0);
         const topic = categories.filter(c => c.group === 'topic').reduce((s, c) => s + c.count, 0);
-        return { totalChars: total, totalCategories: categories.length, hskChars: hsk, topicChars: topic, categories };
+        return { 
+            totalChars: total, 
+            totalCategories: categories.length, 
+            hskChars: hsk, 
+            topicChars: topic, 
+            categories 
+        };
     }
 };
 
+// Экспорт в глобальную область
 if (typeof window !== 'undefined') {
     window.HANZI_DATABASE = HANZI_DATABASE;
     window.HanziDB = HanziDB;
