@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>漢字 · Каллиграфия</title>
+
+    <!-- PWA: Мета-теги -->
+    <meta name="description" content="Тренажёр китайской каллиграфии — учись писать иероглифы правильно">
+    <meta name="theme-color" content="#1e1a17">
+    
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="漢字">
+    <link rel="apple-touch-icon" href="icon.svg">
+
+    <!-- Android PWA -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Иконки -->
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+
+    <!-- Шрифты и библиотека -->
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5.0/dist/hanzi-writer.min.js"></script>
+    <script src="hanzi-db.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #1e1a17;
+            --paper-color: #f7f2e9;
+            --ink-color: #2b221b;
+            --accent-green: #4CD964;
+            --accent-red: #FF3B30;
+            --accent-gold: #D4A840;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Noto Sans', system-ui, sans-serif;
+            touch-action: none;
+            padding: 0.5rem;
+        }
+        html { height: -webkit-fill-available; }
+
+        .game-container {
+            background: var(--paper-color);
+            background-image: radial-gradient(circle at 20% 30%, #fdfaf5 0%, #efe6d8 100%);
+            padding: 1rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 2px #b8a58b inset;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            position: relative;
+        }
+
+        /* Верхняя панель */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .char-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex: 1;
+        }
+        .char-main {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: clamp(2rem, 7vw, 3rem);
+            color: var(--ink-color);
+            line-height: 1;
+        }
+        .char-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+        .pinyin { color: #8a4a2a; font-weight: 700; font-size: 0.95rem; }
+        .meaning { color: #4a6a4a; font-weight: 600; font-size: 0.85rem; }
+        
+        .category-btn {
+            background: #dacfc1;
+            border: none;
+            border-radius: 1rem;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--ink-color);
+            box-shadow: 0 3px 0 #aa9884;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .category-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 #aa9884;
+        }
+
+        /* Холст */
+        .writer-wrapper {
+            background: #fcf8f0;
+            border-radius: 1.5rem;
+            box-shadow: 0 6px 0 #baaa92, 0 12px 28px rgba(0,0,0,0.15);
+            padding: 0.5rem;
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            transition: transform 0.1s;
+        }
+        .writer-wrapper.shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        #hw-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+            position: relative;
+        }
+        #hw-container svg {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+
+        .instruction {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6a5a4a;
+            font-style: italic;
+            min-height: 1.2em;
+        }
+
+        /* Прогресс */
+        .stroke-progress {
+            width: 100%;
+            height: 8px;
+            background: #ddd0c0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .stroke-progress-fill {
+            height: 100%;
+            background: var(--accent-green);
+            width: 0%;
+            transition: width 0.3s ease-out;
+        }
+
+        /* Статистика */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ede3d6;
+            padding: 0.5rem 0.8rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #3d3229;
+        }
+        .combo-badge {
+            background: var(--accent-gold);
+            color: #2a1a0a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .combo-badge.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Кнопки */
+        .controls {
+            display: flex;
+            gap: 0.6rem;
+        }
+        .btn {
+            flex: 1;
+            background: #dacfc1;
+            border: none;
+            border-radius: 1rem;
+            padding: 0.7rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--ink-color);
+            box-shadow: 0 4px 0 #aa9884;
+            transition: all 0.1s ease;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #aa9884;
+        }
+        .btn-primary { background: #c9b39b; box-shadow: 0 4px 0 #8e7b66; }
+        .btn-hint { 
+            background: #8fb88a; 
+            color: #1f2a1c; 
+            box-shadow: 0 4px 0 #5f7a5a; 
+            flex: 0.6;
+        }
+
+        /* Всплывающий текст */
+        .floating-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 800;
+            color: var(--accent-gold);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+            white-space: nowrap;
+        }
+        .floating-text.show {
+            animation: floatUp 1s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -100%) scale(1); }
+        }
+
+        /* Модальное окно выбора категории */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 1rem;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: var(--paper-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal h2 {
+            font-size: 1.3rem;
+            color: var(--ink-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .category-item {
+            background: #ede3d6;
+            border: 2px solid transparent;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: left;
+        }
+        .category-item:active {
+            transform: scale(0.98);
+        }
+        .category-item.active {
+            border-color: var(--accent-gold);
+            background: #f5ead8;
+        }
+        .category-item-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--ink-color);
+        }
+        .category-item-desc {
+            font-size: 0.8rem;
+            color: #6a5a4a;
+            margin-top: 0.2rem;
+        }
+        .modal-close {
+            margin-top: 1rem;
+            width: 100%;
+            background: #c9b39b;
+            border: none;
+            border-radius: 1rem;
+            padding: 0.7rem;
+            font-weight: 700;
+            color: var(--ink-color);
+            box-shadow: 0 4px 0 #8e7b66;
+            cursor: pointer;
+        }
+
+        /* Салют */
+        .firework-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 999; overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="top-bar">
+        <div class="char-info">
+            <div class="char-main" id="charDisplay">永</div>
+            <div class="char-meta">
+                <span class="pinyin" id="pinyinDisplay">yǒng</span>
+                <span class="meaning" id="meaningDisplay">вечный</span>
+            </div>
+        </div>
+        <button class="category-btn" id="categoryBtn">📚 Категории</button>
+    </div>
+
+    <div class="instruction" id="instructionText">✍️ Обведите иероглиф по порядку черт</div>
+
+    <div class="writer-wrapper" id="writerWrapper">
+        <div id="hw-container"></div>
+        <div class="floating-text" id="floatingText"></div>
+    </div>
+
+    <div class="stroke-progress">
+        <div class="stroke-progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="stats-bar">
+        <div>⭐ <span id="scoreDisplay">0</span></div>
+        <div class="combo-badge" id="comboBadge">🔥 x<span id="comboDisplay">0</span></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-hint" id="hintBtn">👁️</button>
+        <button class="btn btn-primary" id="nextBtn">Следующий ⏭️</button>
+    </div>
+</div>
+
+<!-- Модальное окно категорий -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h2>📚 Выберите категорию</h2>
+        <div class="category-list" id="categoryList"></div>
+        <button class="modal-close" id="modalClose">Закрыть</button>
+    </div>
+</div>
+
+<div id="fireworkContainer" class="firework-container"></div>
+
+<script>
+    // === СОСТОЯНИЕ ===
+    let currentCategory = 'basic';
+    let currentItems = [];
+    let currentIndex = 0;
+    let score = 0;
+    let combo = 0;
+    let currentStrokesTotal = 0;
+    let currentStrokesCorrect = 0;
+    let hwWriter = null;
+    let audioCtx = null;
+
+    // === DOM ===
+    const charDisplay = document.getElementById('charDisplay');
+    const pinyinDisplay = document.getElementById('pinyinDisplay');
+    const meaningDisplay = document.getElementById('meaningDisplay');
+    const instructionText = document.getElementById('instructionText');
+    const writerWrapper = document.getElementById('writerWrapper');
+    const hwContainer = document.getElementById('hw-container');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const comboDisplay = document.getElementById('comboDisplay');
+    const comboBadge = document.getElementById('comboBadge');
+    const progressFill = document.getElementById('progressFill');
+    const floatingText = document.getElementById('floatingText');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const categoryList = document.getElementById('categoryList');
+
+    // === АУДИО ===
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+        initAudio();
+        const now = audioCtx.currentTime;
+        
+        if (type === 'success') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.1);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        } else if (type === 'error') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(100, now + 0.2);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'complete') {
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.connect(g); g.connect(audioCtx.destination);
+                o.type = 'sine'; o.frequency.value = freq;
+                g.gain.setValueAtTime(0.2, now + i * 0.1);
+                g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.6);
+                o.start(now + i * 0.1); o.stop(now + i * 0.1 + 0.6);
+            });
+        }
+    }
+
+    // === ВИЗУАЛЬНЫЕ ЭФФЕКТЫ ===
+    function showFloatingText(text) {
+        floatingText.textContent = text;
+        floatingText.classList.remove('show');
+        void floatingText.offsetWidth;
+        floatingText.classList.add('show');
+    }
+
+    function triggerShake() {
+        writerWrapper.classList.add('shake');
+        setTimeout(() => writerWrapper.classList.remove('shake'), 400);
+    }
+
+    function launchFirework() {
+        const container = document.getElementById('fireworkContainer');
+        const colors = ['#FFD166', '#FF6B6B', '#4ECDC4', '#FF9F1C', '#B980F0'];
+        for (let i = 0; i < 40; i++) {
+            const el = document.createElement('div');
+            const size = 6 + Math.random() * 10;
+            const x = 20 + Math.random() * 60;
+            const y = 20 + Math.random() * 60;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            el.style.cssText = `
+                position: absolute; left: ${x}%; top: ${y}%;
+                width: ${size}px; height: ${size}px; background: ${color};
+                border-radius: 50%; pointer-events: none;
+                animation: fireworkBurst ${0.6 + Math.random() * 0.5}s ease-out forwards;
+            `;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 1200);
+        }
+    }
+
+    // === РАЗМЕР ===
+    function getWriterSize() {
+        const rect = hwContainer.getBoundingClientRect();
+        return Math.max(200, Math.floor(Math.min(rect.width, rect.height)));
+    }
+
+    // === ЗАГРУЗКА ИЕРОГЛИФА ===
+    function loadCharacter(index) {
+        if (currentItems.length === 0) return;
+        const data = currentItems[index];
+        charDisplay.textContent = data.char;
+        pinyinDisplay.textContent = data.pinyin;
+        meaningDisplay.textContent = data.meaning;
+        
+        currentStrokesCorrect = 0;
+        updateProgress(0);
+        instructionText.textContent = "✍️ Обведите иероглиф по порядку черт";
+        instructionText.style.color = "#6a5a4a";
+
+        hwContainer.innerHTML = '';
+        const size = getWriterSize();
+        
+        hwWriter = HanziWriter.create('hw-container', data.char, {
+            width: size,
+            height: size,
+            padding: 15,
+            showOutline: true,
+            strokeAnimationSpeed: 2.5,
+            delayBetweenStrokes: 200,
+            drawingWidth: Math.max(15, size * 0.06),
+            showCharacter: false,
+            highlightColor: '#FF3B30',
+            outlineColor: '#D1D1D6',
+            drawingColor: '#1C1C1E',
+            showHintAfterMisses: 1,
+            highlightOnComplete: true
+        });
+
+        hwWriter.getCharacterData().then(function(charData) {
+            currentStrokesTotal = charData.strokes.length;
+            updateProgress(0);
+        });
+
+        hwWriter.quiz({
+            onCorrectStroke: function(strokeData) {
+                currentStrokesCorrect = strokeData.strokeNum;
+                combo++;
+                score += 10 * combo;
+                playSound('success');
+                updateUI();
+                updateProgress((currentStrokesCorrect / currentStrokesTotal) * 100);
+                if (combo >= 3) showFloatingText(`🔥 Комбо x${combo}!`);
+            },
+            onMistake: function() {
+                combo = 0;
+                playSound('error');
+                triggerShake();
+                updateUI();
+                instructionText.textContent = "⚠️ Ошибка! Смотрите на красную подсказку";
+                instructionText.style.color = "#8a4a2a";
+            },
+            onComplete: function(summaryData) {
+                playSound('complete');
+                launchFirework();
+                score += 100;
+                const accuracy = summaryData.totalMistakes === 0 ? 100 : Math.max(0, Math.round((1 - summaryData.totalMistakes / currentStrokesTotal) * 100));
+                showFloatingText(accuracy === 100 ? '💯 Идеально!' : `✅ Готово! (${accuracy}%)`);
+                instructionText.textContent = "🎉 Отлично! Загрузка следующего...";
+                instructionText.style.color = "#4a6a4a";
+                setTimeout(() => nextCharacter(), 2500);
+            }
+        });
+    }
+
+    function updateUI() {
+        scoreDisplay.textContent = score;
+        comboDisplay.textContent = combo;
+        comboBadge.classList.toggle('active', combo >= 2);
+    }
+
+    function updateProgress(percent) {
+        progressFill.style.width = `${Math.min(percent, 100)}%`;
+    }
+
+    function nextCharacter() {
+        currentIndex = (currentIndex + 1) % currentItems.length;
+        loadCharacter(currentIndex);
+    }
+
+    function loadCategory(categoryKey) {
+        currentCategory = categoryKey;
+        currentItems = HanziDB.shuffle(HanziDB.getCategory(categoryKey));
+        currentIndex = 0;
+        if (currentItems.length > 0) loadCharacter(0);
+        updateCategoryList();
+        localStorage.setItem('hanzi_category', categoryKey);
+    }
+
+    // === МОДАЛЬНОЕ ОКНО КАТЕГОРИЙ ===
+    function updateCategoryList() {
+        categoryList.innerHTML = '';
+        const categories = HanziDB.getCategories();
+        categories.forEach(cat => {
+            const item = document.createElement('div');
+            item.className = 'category-item' + (cat.key === currentCategory ? ' active' : '');
+            item.innerHTML = `
+                <div class="category-item-name">${cat.name} <span style="opacity:0.5;font-size:0.85rem;">(${cat.count})</span></div>
+                <div class="category-item-desc">${cat.description}</div>
+            `;
+            item.addEventListener('click', () => {
+                loadCategory(cat.key);
+                modalOverlay.classList.remove('show');
+            });
+            categoryList.appendChild(item);
+        });
+    }
+
+    function showHint() {
+        if (hwWriter) {
+            initAudio();
+            hwWriter.animateCharacter();
+            instructionText.textContent = "👀 Запомните порядок и направление!";
+        }
+    }
+
+    // === ОБРАБОТЧИКИ ===
+    document.getElementById('nextBtn').addEventListener('click', () => { initAudio(); nextCharacter(); });
+    document.getElementById('hintBtn').addEventListener('click', () => { initAudio(); showHint(); });
+    document.getElementById('categoryBtn').addEventListener('click', () => {
+        updateCategoryList();
+        modalOverlay.classList.add('show');
+    });
+    document.getElementById('modalClose').addEventListener('click', () => {
+        modalOverlay.classList.remove('show');
+    });
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) modalOverlay.classList.remove('show');
+    });
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (hwWriter) loadCharacter(currentIndex);
+        }, 200);
+    });
+
+    // CSS для салюта
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = `@keyframes fireworkBurst { 0% { transform: scale(0); opacity: 1; } 50% { opacity: 1; } 100% { transform: scale(3); opacity: 0; } }`;
+    document.head.appendChild(styleSheet);
+
+    // === РЕГИСТРАЦИЯ SERVICE WORKER ===
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('✅ SW зарегистрирован'))
+                .catch(err => console.log('❌ SW ошибка:', err));
+        });
+    }
+
+    // === СТАРТ ===
+    const savedCategory = localStorage.getItem('hanzi_category') || 'basic';
+    loadCategory(savedCategory);
+</script>
+</body>
+</html>
+
