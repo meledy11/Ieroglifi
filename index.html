@@ -253,7 +253,7 @@
             100% { opacity: 0; transform: translate(-50%, -100%) scale(1); }
         }
 
-        /* Модальное окно выбора категории */
+        /* Модальное окно */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -269,52 +269,205 @@
         .modal {
             background: var(--paper-color);
             border-radius: 1.5rem;
-            padding: 1.5rem;
-            max-width: 400px;
+            padding: 1.2rem;
+            max-width: 420px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            max-height: 80vh;
-            overflow-y: auto;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
         }
         .modal h2 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--ink-color);
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             text-align: center;
         }
+
+        /* === ПОИСК === */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 0.8rem;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.7rem 2.5rem 0.7rem 2.5rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: #fcf8f0;
+            border: 2px solid #d6c4b0;
+            border-radius: 1rem;
+            color: var(--ink-color);
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--accent-gold);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(212, 168, 64, 0.15);
+        }
+        .search-input::placeholder {
+            color: #a09080;
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .search-clear {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #d6c4b0;
+            border: none;
+            border-radius: 50%;
+            width: 1.8rem;
+            height: 1.8rem;
+            font-size: 0.9rem;
+            color: var(--ink-color);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .search-clear:hover { background: #c4b098; }
+        .search-clear.visible { display: flex; }
+
+        /* Список категорий и результатов */
+        .modal-scroll {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 0.3rem;
+        }
+        .modal-scroll::-webkit-scrollbar { width: 6px; }
+        .modal-scroll::-webkit-scrollbar-track { background: transparent; }
+        .modal-scroll::-webkit-scrollbar-thumb { background: #d6c4b0; border-radius: 3px; }
+
+        .group-header {
+            font-size: 0.8rem;
+            color: #6a5a4a;
+            padding: 0.5rem 0.3rem 0.3rem;
+            margin-top: 0.5rem;
+            border-bottom: 1px dashed #d6c4b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .group-header:first-child { margin-top: 0; }
+
         .category-list {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
         .category-item {
             background: #ede3d6;
             border: 2px solid transparent;
             border-radius: 1rem;
-            padding: 0.8rem 1rem;
+            padding: 0.7rem 0.9rem;
             cursor: pointer;
             transition: all 0.15s;
             text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
         }
-        .category-item:active {
-            transform: scale(0.98);
-        }
+        .category-item:active { transform: scale(0.98); }
         .category-item.active {
             border-color: var(--accent-gold);
             background: #f5ead8;
         }
+        .cat-color-bar {
+            width: 4px;
+            height: 36px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        .category-item-content { flex: 1; }
         .category-item-name {
             font-weight: 700;
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: var(--ink-color);
         }
         .category-item-desc {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: #6a5a4a;
+            margin-top: 0.15rem;
+        }
+
+        /* Результаты поиска */
+        .search-results {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .search-result-item {
+            background: #fcf8f0;
+            border: 1px solid #e0d4c0;
+            border-radius: 0.9rem;
+            padding: 0.6rem 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .search-result-item:active {
+            transform: scale(0.98);
+            background: #f5ead8;
+        }
+        .search-result-char {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2rem;
+            color: var(--ink-color);
+            line-height: 1;
+            min-width: 2.2rem;
+            text-align: center;
+        }
+        .search-result-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+        .search-result-pinyin {
+            font-weight: 700;
+            color: #8a4a2a;
+            font-size: 0.9rem;
+        }
+        .search-result-meaning {
+            color: #4a6a4a;
+            font-size: 0.82rem;
+        }
+        .search-result-category {
+            font-size: 0.7rem;
+            color: #8a7a6a;
+            background: #ede3d6;
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.5rem;
+            align-self: flex-start;
             margin-top: 0.2rem;
         }
+        .search-empty {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            color: #8a7a6a;
+            font-size: 0.9rem;
+        }
+        .search-count {
+            font-size: 0.75rem;
+            color: #8a7a6a;
+            text-align: center;
+            padding: 0.3rem;
+        }
+
         .modal-close {
-            margin-top: 1rem;
+            margin-top: 0.8rem;
             width: 100%;
             background: #c9b39b;
             border: none;
@@ -324,12 +477,22 @@
             color: var(--ink-color);
             box-shadow: 0 4px 0 #8e7b66;
             cursor: pointer;
+            flex-shrink: 0;
+        }
+        .modal-close:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #8e7b66;
         }
 
         /* Салют */
         .firework-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 999; overflow: hidden;
+        }
+
+        @media (max-width: 400px) {
+            .modal { padding: 1rem; }
+            .search-result-char { font-size: 1.7rem; min-width: 1.8rem; }
         }
     </style>
 </head>
@@ -344,7 +507,7 @@
                 <span class="meaning" id="meaningDisplay">вечный</span>
             </div>
         </div>
-        <button class="category-btn" id="categoryBtn">📚 Категории</button>
+        <button class="category-btn" id="categoryBtn">📚 Меню</button>
     </div>
 
     <div class="instruction" id="instructionText">✍️ Обведите иероглиф по порядку черт</div>
@@ -369,11 +532,32 @@
     </div>
 </div>
 
-<!-- Модальное окно категорий -->
+<!-- Модальное окно с поиском и категориями -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
-        <h2>📚 Выберите категорию</h2>
-        <div class="category-list" id="categoryList"></div>
+        <h2>📚 Иероглифы</h2>
+        
+        <!-- Строка поиска -->
+        <div class="search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="Поиск: 水, shuǐ, вода..."
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+            >
+            <button class="search-clear" id="searchClear" title="Очистить">✕</button>
+        </div>
+
+        <!-- Контент (категории или результаты поиска) -->
+        <div class="modal-scroll" id="modalScroll">
+            <div id="categoriesView"></div>
+            <div id="searchView" style="display:none;"></div>
+        </div>
+
         <button class="modal-close" id="modalClose">Закрыть</button>
     </div>
 </div>
@@ -391,7 +575,8 @@
     let currentStrokesCorrect = 0;
     let hwWriter = null;
     let audioCtx = null;
-    let isShowingHint = false;  // Флаг блокировки во время подсказки
+    let isShowingHint = false;
+    let isSingleMode = false; // Режим одиночного иероглифа (из поиска)
 
     // === DOM ===
     const charDisplay = document.getElementById('charDisplay');
@@ -406,7 +591,10 @@
     const progressFill = document.getElementById('progressFill');
     const floatingText = document.getElementById('floatingText');
     const modalOverlay = document.getElementById('modalOverlay');
-    const categoryList = document.getElementById('categoryList');
+    const categoriesView = document.getElementById('categoriesView');
+    const searchView = document.getElementById('searchView');
+    const searchInput = document.getElementById('searchInput');
+    const searchClear = document.getElementById('searchClear');
     const hintBtn = document.getElementById('hintBtn');
 
     // === АУДИО ===
@@ -561,9 +749,16 @@
                 score += 100;
                 const accuracy = summaryData.totalMistakes === 0 ? 100 : Math.max(0, Math.round((1 - summaryData.totalMistakes / currentStrokesTotal) * 100));
                 showFloatingText(accuracy === 100 ? '💯 Идеально!' : `✅ Готово! (${accuracy}%)`);
-                instructionText.textContent = "🎉 Отлично! Загрузка следующего...";
-                instructionText.style.color = "#4a6a4a";
-                setTimeout(() => nextCharacter(), 2500);
+                
+                if (isSingleMode) {
+                    // В режиме поиска — просто ждём следующего нажатия
+                    instructionText.textContent = "🎉 Готово! Выберите следующий иероглиф";
+                    instructionText.style.color = "#4a6a4a";
+                } else {
+                    instructionText.textContent = "🎉 Отлично! Загрузка следующего...";
+                    instructionText.style.color = "#4a6a4a";
+                    setTimeout(() => nextCharacter(), 2500);
+                }
             }
         });
     }
@@ -579,6 +774,7 @@
     }
 
     function nextCharacter() {
+        if (isSingleMode) return; // В режиме поиска не переключаем автоматически
         currentIndex = (currentIndex + 1) % currentItems.length;
         loadCharacter(currentIndex);
     }
@@ -587,73 +783,231 @@
         currentCategory = categoryKey;
         currentItems = HanziDB.shuffle(HanziDB.getCategory(categoryKey));
         currentIndex = 0;
+        isSingleMode = false;
         if (currentItems.length > 0) loadCharacter(0);
         updateCategoryList();
         localStorage.setItem('hanzi_category', categoryKey);
+        localStorage.removeItem('hanzi_single_mode');
     }
 
-    // === ПОДСКАЗКА (ИСПРАВЛЕННАЯ) ===
+    // === ЗАГРУЗКА ОДНОГО ИЕРОГЛИФА (из поиска) ===
+    function loadSingleChar(charData) {
+        currentCategory = null;
+        currentItems = [charData];
+        currentIndex = 0;
+        isSingleMode = true;
+        loadCharacter(0);
+        localStorage.setItem('hanzi_single_mode', JSON.stringify(charData));
+        localStorage.removeItem('hanzi_category');
+    }
+
+    // === ПОДСКАЗКА ===
     function showHint() {
         if (!hwWriter || isShowingHint) return;
         
         initAudio();
         isShowingHint = true;
         
-        // Визуальная обратная связь
         instructionText.textContent = "👀 Смотрите анимацию...";
         instructionText.style.color = "#8a4a2a";
         
-        // Блокируем кнопку подсказки
         hintBtn.disabled = true;
         hintBtn.style.opacity = '0.5';
         
-        // Показываем анимацию написания
         hwWriter.animateCharacter({
             onComplete: function() {
-                // Даём пользователю досмотреть анимацию
                 setTimeout(() => {
                     isShowingHint = false;
-                    
-                    // Перезапускаем иероглиф — квиз снова активен!
                     loadCharacter(currentIndex);
-                    
                     showFloatingText("🔄 Начинаем заново");
                 }, 800);
             }
         });
     }
 
-    // === МОДАЛЬНОЕ ОКНО КАТЕГОРИЙ ===
-    function updateCategoryList() {
-        categoryList.innerHTML = '';
-        const categories = HanziDB.getCategories();
-        categories.forEach(cat => {
-            const item = document.createElement('div');
-            item.className = 'category-item' + (cat.key === currentCategory ? ' active' : '');
-            item.innerHTML = `
-                <div class="category-item-name">${cat.name} <span style="opacity:0.5;font-size:0.85rem;">(${cat.count})</span></div>
-                <div class="category-item-desc">${cat.description}</div>
+    // === ПОИСК ===
+    function performSearch(query) {
+        query = query.trim().toLowerCase();
+        searchView.innerHTML = '';
+        
+        if (!query) {
+            searchView.style.display = 'none';
+            categoriesView.style.display = 'block';
+            searchClear.classList.remove('visible');
+            return;
+        }
+        
+        searchClear.classList.add('visible');
+        categoriesView.style.display = 'none';
+        searchView.style.display = 'block';
+        
+        const results = HanziDB.search(query);
+        
+        if (results.length === 0) {
+            searchView.innerHTML = `
+                <div class="search-empty">
+                    🔍 Ничего не найдено по запросу «${escapeHtml(query)}»<br>
+                    <span style="font-size:0.8rem;opacity:0.7;">Попробуйте: иероглиф, пиньинь или перевод</span>
+                </div>
             `;
-            item.addEventListener('click', () => {
-                loadCategory(cat.key);
+            return;
+        }
+        
+        // Ограничим до 50 результатов для производительности
+        const limited = results.slice(0, 50);
+        
+        // Заголовок с количеством
+        const countDiv = document.createElement('div');
+        countDiv.className = 'search-count';
+        countDiv.textContent = results.length > 50 
+            ? `Найдено ${results.length} · показано первые 50` 
+            : `Найдено: ${results.length}`;
+        searchView.appendChild(countDiv);
+        
+        // Список результатов
+        const list = document.createElement('div');
+        list.className = 'search-results';
+        
+        limited.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'search-result-item';
+            const categoryName = HANZI_DATABASE[item.category]?.name || '';
+            el.innerHTML = `
+                <div class="search-result-char">${item.char}</div>
+                <div class="search-result-info">
+                    <div class="search-result-pinyin">${item.pinyin}</div>
+                    <div class="search-result-meaning">${item.meaning}</div>
+                    <div class="search-result-category">${categoryName}</div>
+                </div>
+            `;
+            el.addEventListener('click', () => {
                 modalOverlay.classList.remove('show');
+                loadSingleChar(item);
+                showFloatingText(`📖 ${item.char} · ${item.pinyin}`);
             });
-            categoryList.appendChild(item);
+            list.appendChild(el);
         });
+        
+        searchView.appendChild(list);
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // === КАТЕГОРИИ ===
+    function updateCategoryList() {
+        categoriesView.innerHTML = '';
+        const groups = HanziDB.getCategoriesByGroup();
+        
+        // Уровни HSK
+        if (groups.hsk.length > 0) {
+            const hskHeader = document.createElement('div');
+            hskHeader.className = 'group-header';
+            hskHeader.innerHTML = '🎯 <strong>Уровни HSK</strong> <span style="opacity:0.6;font-size:0.75rem;">комплексно</span>';
+            categoriesView.appendChild(hskHeader);
+            
+            const list = document.createElement('div');
+            list.className = 'category-list';
+            groups.hsk.forEach(cat => {
+                list.appendChild(createCategoryItem(cat));
+            });
+            categoriesView.appendChild(list);
+        }
+        
+        // Тематические
+        if (groups.topic.length > 0) {
+            const topicHeader = document.createElement('div');
+            topicHeader.className = 'group-header';
+            topicHeader.innerHTML = '📚 <strong>Тематические</strong> <span style="opacity:0.6;font-size:0.75rem;">по темам</span>';
+            categoriesView.appendChild(topicHeader);
+            
+            const list = document.createElement('div');
+            list.className = 'category-list';
+            groups.topic.forEach(cat => {
+                list.appendChild(createCategoryItem(cat));
+            });
+            categoriesView.appendChild(list);
+        }
+    }
+
+    function createCategoryItem(cat) {
+        const item = document.createElement('div');
+        item.className = 'category-item' + (cat.key === currentCategory ? ' active' : '');
+        
+        const colorBar = cat.color ? `<span class="cat-color-bar" style="background:${cat.color}"></span>` : '';
+        
+        item.innerHTML = `
+            ${colorBar}
+            <div class="category-item-content">
+                <div class="category-item-name">${cat.name}</div>
+                <div class="category-item-desc">${cat.description} · <strong>${cat.count}</strong> иероглифов</div>
+            </div>
+        `;
+        item.addEventListener('click', () => {
+            loadCategory(cat.key);
+            modalOverlay.classList.remove('show');
+            searchInput.value = '';
+            performSearch('');
+        });
+        return item;
     }
 
     // === ОБРАБОТЧИКИ ===
-    document.getElementById('nextBtn').addEventListener('click', () => { initAudio(); nextCharacter(); });
+    document.getElementById('nextBtn').addEventListener('click', () => { 
+        initAudio(); 
+        if (isSingleMode) {
+            // В режиме поиска — открываем меню для выбора следующего
+            updateCategoryList();
+            modalOverlay.classList.add('show');
+            setTimeout(() => searchInput.focus(), 100);
+        } else {
+            nextCharacter();
+        }
+    });
+    
     hintBtn.addEventListener('click', () => { initAudio(); showHint(); });
+    
     document.getElementById('categoryBtn').addEventListener('click', () => {
         updateCategoryList();
         modalOverlay.classList.add('show');
+        setTimeout(() => searchInput.focus(), 100);
     });
+    
     document.getElementById('modalClose').addEventListener('click', () => {
         modalOverlay.classList.remove('show');
+        searchInput.value = '';
+        performSearch('');
     });
+    
     modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) modalOverlay.classList.remove('show');
+        if (e.target === modalOverlay) {
+            modalOverlay.classList.remove('show');
+            searchInput.value = '';
+            performSearch('');
+        }
+    });
+
+    // Поиск в реальном времени
+    searchInput.addEventListener('input', (e) => {
+        performSearch(e.target.value);
+    });
+    
+    searchClear.addEventListener('click', () => {
+        searchInput.value = '';
+        performSearch('');
+        searchInput.focus();
+    });
+
+    // Закрытие модалки по Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalOverlay.classList.contains('show')) {
+            modalOverlay.classList.remove('show');
+            searchInput.value = '';
+            performSearch('');
+        }
     });
 
     let resizeTimeout;
@@ -669,7 +1023,7 @@
     styleSheet.textContent = `@keyframes fireworkBurst { 0% { transform: scale(0); opacity: 1; } 50% { opacity: 1; } 100% { transform: scale(3); opacity: 0; } }`;
     document.head.appendChild(styleSheet);
 
-    // === РЕГИСТРАЦИЯ SERVICE WORKER ===
+    // === SERVICE WORKER ===
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js')
@@ -679,8 +1033,22 @@
     }
 
     // === СТАРТ ===
-    const savedCategory = localStorage.getItem('hanzi_category') || 'basic';
-    loadCategory(savedCategory);
+    // Восстановление состояния
+    const savedSingle = localStorage.getItem('hanzi_single_mode');
+    const savedCategory = localStorage.getItem('hanzi_category');
+    
+    if (savedSingle) {
+        try {
+            const charData = JSON.parse(savedSingle);
+            loadSingleChar(charData);
+        } catch(e) {
+            loadCategory('basic');
+        }
+    } else if (savedCategory && HANZI_DATABASE[savedCategory]) {
+        loadCategory(savedCategory);
+    } else {
+        loadCategory('basic');
+    }
 </script>
 </body>
 </html>
