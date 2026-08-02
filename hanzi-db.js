@@ -1110,4 +1110,161 @@ if (typeof window !== 'undefined') {
 }
 
 console.log(`📚 База загружена: ${HanziDB.getStats().totalChars} иероглифов в ${HanziDB.getStats().totalCategories} категориях`);
+// ============================================================
+// 📊 СИСТЕМА ПРОГРЕССА И ИНТЕРВАЛЬНОГО ПОВТОРЕНИЯ
+// ============================================================
+const HanziProgress = {
+    STORAGE_KEY: 'hanzi_progress_v1',
+    STREAK_KEY: 'hanzi_streak_v1',
+    
+    load: function() {
+        try {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            return data ? JSON.parse(data) : {};
+        } catch(e) { return {}; }
+    },
+    
+    save: function(progress) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(progress));
+    },
+    
+    get: function(char) {
+        const progress = this.load();
+        return progress[char] || {
+            char: char, attempts: 0, successes: 0, mistakes: 0,
+            bestAccuracy: 0, level: 0, nextReview: 0,
+            lastSeen: 0, mastered: false
+        };
+    },
+    
+    recordSuccess: function(char, accuracy) {
+        const progress = this.load();
+        const data = this.get(char);
+        data.attempts++;
+        data.successes++;
+        data.lastSeen = Date.now();
+        if (accuracy > data.bestAccuracy) data.bestAccuracy = accuracy;
+        if (accuracy >= 90) data.level = Math.min(5, data.level + 1);
+        
+        const intervals = [0, 24*3600*1000, 3*24*3600*1000, 7*24*3600*1000, 14*24*3600*1000, 30*24*3600*1000];
+        data.nextReview = Date.now() + intervals[data.level];
+        
+        if (data.level >= 5 && data.successes >= 5) data.mastered = true;
+        
+        progress[char] = data;
+        this.save(progress);
+        this.updateStreak();
+        return data;
+    },
+    
+    recordMistake: function(char, mistakesCount) {
+        const progress = this.load();
+        const data = this.get(char);
+        data.attempts++;
+        data.mistakes += mistakesCount;
+        data.lastSeen = Date.now();
+        data.level = Math.max(0, data.level - 2);
+        data.nextReview = Date.now();
+        
+        progress[char] = data;
+        this.save(progress);
+        return data;
+    },
+    
+    getDueForReview: function(categoryKey) {
+        const progress = this.load();
+        const now = Date.now();
+        const due = [];
+        const items = categoryKey ? HanziDB.getCategory(categoryKey) : HanziDB.getAll();
+        
+        items.forEach(item => {
+            const data = progress[item.char];
+            if (!data) {
+                due.push({ ...item, priority: 1, status: 'new' });
+            } else if (data.nextReview <= now && !data.mastered) {
+                const urgency = (now - data.nextReview) / (24 * 3600 * 1000);
+                due.push({ ...item, priority: 2 + urgency, status: 'due', progress: data });
+            }
+        });
+        due.sort((a, b) => b.priority - a.priority);
+        return due;
+    },
+    
+    getWeakSpots: function(limit) {
+        limit = limit || 20;
+        const progress = this.load();
+        const weak = [];
+        for (const char in progress) {
+            const data = progress[char];
+            if (data.attempts >= 2 && !data.mastered) {
+                const accuracy = data.successes / data.attempts;
+                if (accuracy < 0.8) {
+                    const item = HanziDB.findByChar(char);
+                    if (item) weak.push({ ...item, accuracy: accuracy, data: data });
+                }
+            }
+        }
+        weak.sort((a, b) => a.accuracy - b.accuracy);
+        return weak.slice(0, limit);
+    },
+    
+    getStats: function() {
+        const progress = this.load();
+        const chars = Object.values(progress);
+        const totalAttempts = chars.reduce((s, c) => s + c.attempts, 0);
+        const totalSuccesses = chars.reduce((s, c) => s + c.successes, 0);
+        const mastered = chars.filter(c => c.mastered).length;
+        const streak = this.getStreak();
+        const dueCount = this.getDueForReview().filter(i => i.status === 'due').length;
+        
+        return {
+            totalAttempts: totalAttempts,
+            totalSuccesses: totalSuccesses,
+            accuracy: totalAttempts > 0 ? Math.round((totalSuccesses / totalAttempts) * 100) : 0,
+            mastered: mastered,
+            streak: streak.current,
+            bestStreak: streak.best,
+            dueCount: dueCount
+        };
+    },
+    
+    getStreak: function() {
+        try {
+            const data = localStorage.getItem(this.STREAK_KEY);
+            return data ? JSON.parse(data) : { current: 0, best: 0, lastDate: null };
+        } catch(e) { return { current: 0, best: 0, lastDate: null }; }
+    },
+    
+    updateStreak: function() {
+        const streak = this.getStreak();
+        const today = new Date().toDateString();
+        if (streak.lastDate === today) return;
+        
+        const yesterday = new Date(Date.now() - 24 * 3600 * 1000).toDateString();
+        if (streak.lastDate === yesterday) {
+            streak.current++;
+        } else if (!streak.lastDate) {
+            streak.current = 1;
+        } else {
+            streak.current = 1;
+        }
+        streak.lastDate = today;
+        if (streak.current > streak.best) streak.best = streak.current;
+        localStorage.setItem(this.STREAK_KEY, JSON.stringify(streak));
+    },
+    
+    reset: function() {
+        localStorage.removeItem(this.STORAGE_KEY);
+        localStorage.removeItem(this.STREAK_KEY);
+    }
+};
+
+// Экспорт HanziProgress в глобальную область
+if (typeof window !== 'undefined') {
+    window.HanziProgress = HanziProgress;
+}
+
+console.log(`📊 Система прогресса и интервального повторения загружена`);
+
+
 
