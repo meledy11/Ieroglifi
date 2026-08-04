@@ -1004,7 +1004,7 @@
         currentCategoryName = cat ? cat.name : '📚 Иероглифы';
         heroCategory.textContent = currentCategoryName;
         
-        currentItems = HanziDB.shuffle(HanziDB.getCategory(categoryKey));
+        currentItems = HanziDB.shuffle(HanziDB.getUniqueCategory(categoryKey));
         currentIndex = 0;
         isSingleMode = false;
         if (currentItems.length > 0) loadCharacter(0);
