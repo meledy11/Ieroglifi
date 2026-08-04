@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>漢字 · Каллиграфия</title>
 
-    <meta name="description" content="Тренажёр китайской каллиграфии с озвучкой, прогрессом и интервальным повторением">
+    <meta name="description" content="Тренажёр китайской каллиграфии с примерами слов и озвучкой">
     <meta name="theme-color" content="#1e1a17">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -56,9 +56,7 @@
             position: relative;
         }
 
-        /* ============================================ */
-        /* 🔝 УВЕЛИЧЕННАЯ ВЕРХНЯЯ ПАНЕЛЬ (иероглиф + пиньинь + перевод) */
-        /* ============================================ */
+        /* Верхняя панель */
         .hero-panel {
             background: linear-gradient(135deg, #fffaf0 0%, #f5ead8 100%);
             border-radius: 1.5rem;
@@ -118,7 +116,6 @@
             color: #4a6a4a;
             font-weight: 600;
             line-height: 1.2;
-            text-transform: lowercase;
         }
         .hero-bottom-row {
             display: flex;
@@ -164,9 +161,7 @@
             box-shadow: 0 0 0 #aa9884;
         }
 
-        /* ============================================ */
-        /* 🎨 ХОЛСТ (рисуем иероглиф) */
-        /* ============================================ */
+        /* Холст */
         .writer-wrapper {
             background: #fcf8f0;
             border-radius: 1.5rem;
@@ -196,7 +191,6 @@
             min-height: 1.2em;
         }
 
-        /* Индикатор статуса иероглифа */
         .char-status {
             position: absolute;
             top: 0.7rem;
@@ -217,7 +211,6 @@
             50% { transform: scale(1.08); }
         }
 
-        /* Прогресс */
         .stroke-progress {
             width: 100%;
             height: 8px;
@@ -232,7 +225,6 @@
             transition: width 0.3s ease-out;
         }
 
-        /* Статистика (нижняя полоска) */
         .stats-bar {
             display: flex;
             justify-content: space-between;
@@ -262,7 +254,6 @@
         }
         .combo-badge.active { opacity: 1; transform: scale(1); }
 
-        /* Кнопки */
         .controls { display: flex; gap: 0.6rem; }
         .btn {
             flex: 1;
@@ -284,9 +275,9 @@
         .btn:active { transform: translateY(4px); box-shadow: 0 0 0 #aa9884; }
         .btn:disabled { opacity: 0.5; pointer-events: none; }
         .btn-primary { background: #c9b39b; box-shadow: 0 4px 0 #8e7b66; }
-        .btn-hint { background: #8fb88a; color: #1f2a1c; box-shadow: 0 4px 0 #5f7a5a; flex: 0.6; }
+        .btn-hint { background: #8fb88a; color: #1f2a1c; box-shadow: 0 4px 0 #5f7a5a; flex: 0.5; }
+        .btn-examples { background: #b8a8d8; color: #2a1a3a; box-shadow: 0 4px 0 #8a7aa8; flex: 0.5; }
 
-        /* Всплывающий текст */
         .floating-text {
             position: absolute;
             top: 50%; left: 50%;
@@ -307,9 +298,7 @@
             100% { opacity: 0; transform: translate(-50%, -100%) scale(1); }
         }
 
-        /* ============================================ */
-        /* 📋 МОДАЛЬНОЕ ОКНО */
-        /* ============================================ */
+        /* Модальное окно */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6);
@@ -328,7 +317,6 @@
         }
         .modal h2 { font-size: 1.2rem; color: var(--ink-color); margin-bottom: 0.8rem; text-align: center; }
 
-        /* Статистика в модалке */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -361,7 +349,6 @@
         .stat-card.highlight .stat-card-value,
         .stat-card.highlight .stat-card-label { color: #2a1a0a; }
 
-        /* Режимы обучения */
         .mode-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -390,7 +377,6 @@
             margin-top: 0.15rem;
         }
 
-        /* Поиск */
         .search-wrapper { position: relative; margin-bottom: 0.8rem; }
         .search-input {
             width: 100%; padding: 0.7rem 2.5rem 0.7rem 2.5rem;
@@ -431,7 +417,6 @@
         .category-item-name { font-weight: 700; font-size: 1rem; color: var(--ink-color); }
         .category-item-desc { font-size: 0.78rem; color: #6a5a4a; margin-top: 0.15rem; }
 
-        /* Результаты поиска */
         .search-results { display: flex; flex-direction: column; gap: 0.4rem; }
         .search-result-item {
             background: #fcf8f0; border: 1px solid #e0d4c0; border-radius: 0.9rem;
@@ -454,6 +439,108 @@
         }
         .modal-close:active { transform: translateY(4px); box-shadow: 0 0 0 #8e7b66; }
 
+        /* Модальное окно примеров */
+        .examples-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1001; padding: 1rem; backdrop-filter: blur(6px);
+        }
+        .examples-modal.show { display: flex; }
+        .examples-content {
+            background: var(--paper-color);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-width: 400px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            max-height: 80vh;
+            display: flex; flex-direction: column;
+        }
+        .examples-header {
+            text-align: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px dashed #d6c4b0;
+        }
+        .examples-char {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3rem;
+            color: var(--ink-color);
+            line-height: 1;
+        }
+        .examples-pinyin {
+            font-size: 1.2rem;
+            color: #8a4a2a;
+            font-weight: 700;
+            margin-top: 0.3rem;
+        }
+        .examples-meaning {
+            font-size: 1rem;
+            color: #4a6a4a;
+            font-weight: 600;
+            margin-top: 0.2rem;
+        }
+        .examples-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .example-item {
+            background: #fcf8f0;
+            border: 2px solid #e0d4c0;
+            border-radius: 1rem;
+            padding: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .example-item:active {
+            transform: scale(0.98);
+            background: #f5ead8;
+            border-color: var(--accent-gold);
+        }
+        .example-word {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2rem;
+            color: var(--ink-color);
+            line-height: 1;
+            min-width: 3rem;
+            text-align: center;
+        }
+        .example-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        .example-pinyin {
+            font-weight: 700;
+            color: #8a4a2a;
+            font-size: 0.95rem;
+        }
+        .example-meaning {
+            color: #4a6a4a;
+            font-size: 0.85rem;
+        }
+        .example-speak {
+            font-size: 1.5rem;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .example-item:hover .example-speak {
+            opacity: 1;
+        }
+        .examples-empty {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #8a7a6a;
+            font-size: 0.9rem;
+        }
+
         .firework-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
         
         @media (max-width: 400px) {
@@ -464,12 +551,54 @@
             .hero-pinyin { font-size: 1.3rem; }
             .hero-meaning { font-size: 1rem; }
         }
+        /* === БЛОК ПРОГРЕССА ИЗУЧЕНИЯ === */
+.mastery-block {
+    background: #fcf8f0;
+    border: 2px solid #e0d4c0;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    text-align: center;
+}
+.mastery-stars {
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+.star-filled { color: #D4A840; text-shadow: 0 2px 4px rgba(212, 168, 64, 0.3); }
+.star-empty { color: #d6c4b0; }
+
+.mastery-bar-bg {
+    width: 100%;
+    height: 12px;
+    background: #e0d4c0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+}
+.mastery-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CD964, #D4A840);
+    border-radius: 6px;
+    transition: width 0.5s ease-out;
+}
+.mastery-text {
+    font-size: 0.85rem;
+    color: #6a5a4a;
+    font-weight: 600;
+}
+.mastery-text.mastered {
+    color: #4CD964;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+
     </style>
 </head>
 <body>
 
 <div class="game-container">
-    <!-- 🔝 УВЕЛИЧЕННАЯ ВЕРХНЯЯ ПАНЕЛЬ -->
     <div class="hero-panel" id="heroPanel">
         <div class="hero-top-row">
             <div class="hero-char" id="charDisplay">永</div>
@@ -504,17 +633,17 @@
     </div>
 
     <div class="controls">
-        <button class="btn btn-hint" id="hintBtn">👁️ Подсказка</button>
-        <button class="btn btn-primary" id="nextBtn">Следующий ⏭️</button>
+        <button class="btn btn-hint" id="hintBtn">👁️</button>
+        <button class="btn btn-examples" id="examplesBtn">📖 Примеры</button>
+        <button class="btn btn-primary" id="nextBtn">⏭️</button>
     </div>
 </div>
 
-<!-- Модальное окно -->
+<!-- Модальное окно категорий -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <h2>📚 Иероглифы</h2>
         
-        <!-- Статистика -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card highlight">
                 <div class="stat-card-value" id="statStreak">0 🔥</div>
@@ -534,7 +663,6 @@
             </div>
         </div>
         
-        <!-- Режимы обучения -->
         <div class="mode-buttons">
             <div class="mode-btn" id="modeDue">
                 <span class="mode-btn-icon">🔄</span>
@@ -548,7 +676,6 @@
             </div>
         </div>
         
-        <!-- Поиск -->
         <div class="search-wrapper">
             <span class="search-icon">🔍</span>
             <input type="text" id="searchInput" class="search-input" placeholder="Поиск: 水, shuǐ, вода..." autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -563,10 +690,22 @@
     </div>
 </div>
 
+<!-- Модальное окно примеров -->
+<div class="examples-modal" id="examplesModal">
+    <div class="examples-content">
+        <div class="examples-header">
+            <div class="examples-char" id="examplesChar">水</div>
+            <div class="examples-pinyin" id="examplesPinyin">shuǐ</div>
+            <div class="examples-meaning" id="examplesMeaning">вода</div>
+        </div>
+        <div class="examples-list" id="examplesList"></div>
+        <button class="modal-close" id="examplesClose">Закрыть</button>
+    </div>
+</div>
+
 <div id="fireworkContainer" class="firework-container"></div>
 
 <script>
-    // === СОСТОЯНИЕ ===
     let currentCategory = 'basic';
     let currentCategoryName = '📚 HSK 1';
     let currentItems = [];
@@ -580,7 +719,6 @@
     let isShowingHint = false;
     let isSingleMode = false;
 
-    // === DOM ===
     const heroPanel = document.getElementById('heroPanel');
     const charDisplay = document.getElementById('charDisplay');
     const pinyinDisplay = document.getElementById('pinyinDisplay');
@@ -603,6 +741,12 @@
     const searchInput = document.getElementById('searchInput');
     const searchClear = document.getElementById('searchClear');
     const hintBtn = document.getElementById('hintBtn');
+    const examplesBtn = document.getElementById('examplesBtn');
+    const examplesModal = document.getElementById('examplesModal');
+    const examplesChar = document.getElementById('examplesChar');
+    const examplesPinyin = document.getElementById('examplesPinyin');
+    const examplesMeaning = document.getElementById('examplesMeaning');
+    const examplesList = document.getElementById('examplesList');
     const statStreak = document.getElementById('statStreak');
     const statMastered = document.getElementById('statMastered');
     const statAccuracy = document.getElementById('statAccuracy');
@@ -610,7 +754,6 @@
     const modeDue = document.getElementById('modeDue');
     const modeWeak = document.getElementById('modeWeak');
 
-    // === АУДИО И ОЗВУЧКА ===
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -672,7 +815,16 @@
         speakNext();
     }
 
-    // === ВИЗУАЛЬНЫЕ ЭФФЕКТЫ ===
+    function speakWord(word) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'zh-CN';
+        utterance.rate = 0.8;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+    }
+
     function showFloatingText(text) {
         floatingText.textContent = text;
         floatingText.classList.remove('show');
@@ -697,13 +849,11 @@
         }
     }
 
-    // === РАЗМЕР И ЗАГРУЗКА ===
     function getWriterSize() {
         const rect = hwContainer.getBoundingClientRect();
         return Math.max(200, Math.floor(Math.min(rect.width, rect.height)));
     }
 
-    // === СТАТУС ИЕРОГЛИФА ===
     function updateCharStatus() {
         if (currentItems.length === 0) return;
         const data = currentItems[currentIndex];
@@ -726,7 +876,6 @@
         }
     }
 
-    // === ОБНОВЛЕНИЕ СТАТИСТИКИ ===
     function updateStats() {
         const stats = HanziProgress.getStats();
         const streakText = `${stats.streak} 🔥`;
@@ -807,7 +956,6 @@
                 score += 100;
                 const accuracy = summaryData.totalMistakes === 0 ? 100 : Math.max(0, Math.round((1 - summaryData.totalMistakes / currentStrokesTotal) * 100));
                 
-                // Записываем прогресс
                 if (summaryData.totalMistakes === 0) {
                     HanziProgress.recordSuccess(data.char, accuracy);
                 } else {
@@ -877,7 +1025,6 @@
         localStorage.removeItem('hanzi_category');
     }
 
-    // === ПОДСКАЗКА (с озвучкой) ===
     function showHint() {
         if (!hwWriter || isShowingHint) return;
         initAudio();
@@ -904,7 +1051,81 @@
         });
     }
 
-    // === РЕЖИМЫ ОБУЧЕНИЯ ===
+        function showExamples() {
+        if (currentItems.length === 0) return;
+        const data = currentItems[currentIndex];
+        
+        // Получаем расширенные данные о прогрессе
+        const progress = HanziProgress.get(data.char);
+        
+        examplesChar.textContent = data.char;
+        examplesPinyin.textContent = data.pinyin;
+        examplesMeaning.textContent = data.meaning;
+        
+        examplesList.innerHTML = '';
+        
+        // 🆕 БЛОК ПРОГРЕССА (Звёзды и полоска)
+        const progressBlock = document.createElement('div');
+        progressBlock.className = 'mastery-block';
+        
+        // Генерируем звёзды (например: ★★★☆☆)
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+            starsHtml += i <= progress.stars ? '<span class="star-filled">★</span>' : '<span class="star-empty">☆</span>';
+        }
+        
+        const isMastered = progress.isMastered;
+        const progressText = isMastered 
+            ? '🎉 Иероглиф полностью выучен!' 
+            : `Прогресс: ${progress.masteryProgress}% (осталось ${progress.levelsRemaining} ур. и ${progress.successesRemaining} усп.)`;
+        
+        progressBlock.innerHTML = `
+            <div class="mastery-stars">${starsHtml}</div>
+            <div class="mastery-bar-bg">
+                <div class="mastery-bar-fill" style="width: ${progress.masteryProgress}%"></div>
+            </div>
+            <div class="mastery-text ${isMastered ? 'mastered' : ''}">${progressText}</div>
+        `;
+        examplesList.appendChild(progressBlock);
+        
+        // Примеры слов (если есть)
+        if (data.examples && data.examples.length > 0) {
+            const examplesHeader = document.createElement('div');
+            examplesHeader.style.cssText = 'font-size: 0.85rem; color: #6a5a4a; font-weight: 700; margin: 1rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;';
+            examplesHeader.textContent = '📖 Примеры слов:';
+            examplesList.appendChild(examplesHeader);
+
+            data.examples.forEach(ex => {
+                const item = document.createElement('div');
+                item.className = 'example-item';
+                item.innerHTML = `
+                    <div class="example-word">${ex.word}</div>
+                    <div class="example-info">
+                        <div class="example-pinyin">${ex.pinyin}</div>
+                        <div class="example-meaning">${ex.meaning}</div>
+                    </div>
+                    <div class="example-speak">🔊</div>
+                `;
+                item.addEventListener('click', () => {
+                    initAudio();
+                    speakWord(ex.word);
+                    item.style.background = '#f5ead8';
+                    setTimeout(() => { item.style.background = ''; }, 300);
+                });
+                examplesList.appendChild(item);
+            });
+        } else {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'examples-empty';
+            emptyMsg.textContent = '📖 Примеры слов для этого иероглифа пока не добавлены';
+            examplesList.appendChild(emptyMsg);
+        }
+        
+        examplesModal.classList.add('show');
+    }
+
+
+
     function startDueReview() {
         const due = HanziProgress.getDueForReview();
         if (due.length === 0) {
@@ -939,7 +1160,6 @@
         showFloatingText('🎯 Слабые места');
     }
 
-    // === ПОИСК ===
     function performSearch(query) {
         query = query.trim().toLowerCase();
         searchView.innerHTML = '';
@@ -996,7 +1216,6 @@
         return div.innerHTML;
     }
 
-    // === КАТЕГОРИИ ===
     function updateCategoryList() {
         categoriesView.innerHTML = '';
         const groups = HanziDB.getCategoriesByGroup();
@@ -1034,10 +1253,7 @@
         return item;
     }
 
-    // === ОБРАБОТЧИКИ ===
-    // 🔊 Клик по верхней панели для озвучки
     heroPanel.addEventListener('click', (e) => {
-        // Не срабатывает при клике по кнопке меню
         if (e.target.closest('#categoryBtn')) return;
         initAudio();
         if (currentItems.length > 0) {
@@ -1050,6 +1266,7 @@
 
     document.getElementById('nextBtn').addEventListener('click', () => { initAudio(); nextCharacter(); });
     hintBtn.addEventListener('click', () => { initAudio(); showHint(); });
+    examplesBtn.addEventListener('click', () => { initAudio(); showExamples(); });
     
     document.getElementById('categoryBtn').addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1065,6 +1282,10 @@
         performSearch('');
     });
     
+    document.getElementById('examplesClose').addEventListener('click', () => {
+        examplesModal.classList.remove('show');
+    });
+    
     modalOverlay.addEventListener('click', (e) => {
         if (e.target === modalOverlay) {
             modalOverlay.classList.remove('show');
@@ -1072,8 +1293,13 @@
             performSearch('');
         }
     });
+    
+    examplesModal.addEventListener('click', (e) => {
+        if (e.target === examplesModal) {
+            examplesModal.classList.remove('show');
+        }
+    });
 
-    // Режимы
     modeDue.addEventListener('click', startDueReview);
     modeWeak.addEventListener('click', startWeakSpots);
 
@@ -1081,10 +1307,14 @@
     searchClear.addEventListener('click', () => { searchInput.value = ''; performSearch(''); searchInput.focus(); });
     
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalOverlay.classList.contains('show')) {
-            modalOverlay.classList.remove('show');
-            searchInput.value = '';
-            performSearch('');
+        if (e.key === 'Escape') {
+            if (examplesModal.classList.contains('show')) {
+                examplesModal.classList.remove('show');
+            } else if (modalOverlay.classList.contains('show')) {
+                modalOverlay.classList.remove('show');
+                searchInput.value = '';
+                performSearch('');
+            }
         }
     });
 
@@ -1106,7 +1336,6 @@
         });
     }
 
-    // === СТАРТ ===
     updateStats();
     const savedSingle = localStorage.getItem('hanzi_single_mode');
     const savedCategory = localStorage.getItem('hanzi_category');
