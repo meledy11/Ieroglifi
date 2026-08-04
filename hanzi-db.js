@@ -1109,7 +1109,7 @@ if (typeof window !== 'undefined') {
     window.HanziDB = HanziDB;
 }
 
-console.log(`📚 База загружена: ${HanziDB.getStats().totalChars} иероглифов в ${HanziDB.getStats().totalCategories} категориях`);
+console.log(`📚 База загружена: ${HanziDB.getStats().totalChars} иероглифов в ${HanziDB.getStats().totalCategories} // ============================================================
 // ============================================================
 // 📊 СИСТЕМА ПРОГРЕССА И ИНТЕРВАЛЬНОГО ПОВТОРЕНИЯ
 // ============================================================
@@ -1130,11 +1130,32 @@ const HanziProgress = {
     
     get: function(char) {
         const progress = this.load();
-        return progress[char] || {
+        const data = progress[char] || {
             char: char, attempts: 0, successes: 0, mistakes: 0,
             bestAccuracy: 0, level: 0, nextReview: 0,
             lastSeen: 0, mastered: false
         };
+        
+        // 🆕 РАСЧЁТ ПРОГРЕССА К "ВЫУЧЕНО"
+        const TARGET_LEVEL = 5;
+        const TARGET_SUCCESSES = 5;
+        
+        const levelProgress = Math.min(100, (data.level / TARGET_LEVEL) * 100);
+        const successProgress = Math.min(100, (data.successes / TARGET_SUCCESSES) * 100);
+        const masteryProgress = Math.round((levelProgress + successProgress) / 2);
+        
+        const stars = data.level;
+        const levelsRemaining = Math.max(0, TARGET_LEVEL - data.level);
+        const successesRemaining = Math.max(0, TARGET_SUCCESSES - data.successes);
+        
+        data.masteryProgress = masteryProgress;
+        data.stars = stars;
+        data.levelsRemaining = levelsRemaining;
+        data.successesRemaining = successesRemaining;
+        data.targetLevel = TARGET_LEVEL;
+        data.targetSuccesses = TARGET_SUCCESSES;
+        
+        return data;
     },
     
     recordSuccess: function(char, accuracy) {
@@ -1208,6 +1229,50 @@ const HanziProgress = {
         return weak.slice(0, limit);
     },
     
+    // 🆕 Получить все выученные иероглифы
+    getMastered: function() {
+        const progress = this.load();
+        const mastered = [];
+        
+        for (const char in progress) {
+            const data = progress[char];
+            if (data.mastered) {
+                const item = HanziDB.findByChar(char);
+                if (item) {
+                    mastered.push({ 
+                        ...item, 
+                        data: data,
+                        masteredDate: data.lastSeen
+                    });
+                }
+            }
+        }
+        
+        mastered.sort((a, b) => b.masteredDate - a.masteredDate);
+        return mastered;
+    },
+    
+    // 🆕 Получить иероглифы "на пути к mastery"
+    getLearning: function(limit) {
+        limit = limit || 30;
+        const progress = this.load();
+        const learning = [];
+        
+        for (const char in progress) {
+            const data = progress[char];
+            if (data.attempts > 0 && !data.mastered) {
+                const item = HanziDB.findByChar(char);
+                if (item) {
+                    const enriched = this.get(char);
+                    learning.push({ ...item, data: enriched });
+                }
+            }
+        }
+        
+        learning.sort((a, b) => b.data.masteryProgress - a.data.masteryProgress);
+        return learning.slice(0, limit);
+    },
+    
     getStats: function() {
         const progress = this.load();
         const chars = Object.values(progress);
@@ -1259,12 +1324,9 @@ const HanziProgress = {
     }
 };
 
-// Экспорт HanziProgress в глобальную область
 if (typeof window !== 'undefined') {
     window.HanziProgress = HanziProgress;
 }
 
 console.log(`📊 Система прогресса и интервального повторения загружена`);
-
-
 
