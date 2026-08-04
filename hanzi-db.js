@@ -856,7 +856,7 @@ const HANZI_DATABASE = {
             { char: '作业', pinyin: 'zuò yè', meaning: 'домашнее задание' }
         ]
     },
-    // ═══════════════════════════════════════════════════════════
+      // ═══════════════════════════════════════════════════════════
     // 📚 ТЕМТИЧЕСКИЕ КАТЕГОРИИ
     // ═══════════════════════════════════════════════════════════
 
@@ -1156,8 +1156,53 @@ const HANZI_DATABASE = {
         group: "topic",
         items: [
             { char: '猫', pinyin: 'māo', meaning: 'кошка', examples: [{ word: '小猫', pinyin: 'xiǎo māo', meaning: 'котёнок' }] },
-            { char: '狗', pinyin: 'gǒu', meaning: 'собака', examples: [{ word: '小狗',
+            { char: '狗', pinyin: 'gǒu', meaning: 'собака', examples: [{ word: '小狗', pinyin: 'xiǎo gǒu', meaning: 'щенок' }] },
+            { char: '鸟', pinyin: 'niǎo', meaning: 'птица', examples: [{ word: '小鸟', pinyin: 'xiǎo niǎo', meaning: 'птичка' }] },
+            { char: '马', pinyin: 'mǎ', meaning: 'лошадь', examples: [{ word: '马上', pinyin: 'mǎ shàng', meaning: 'сейчас' }] },
+            { char: '牛', pinyin: 'niú', meaning: 'корова', examples: [{ word: '牛奶', pinyin: 'niú nǎi', meaning: 'молоко' }] },
+            { char: '羊', pinyin: 'yáng', meaning: 'овца', examples: [{ word: '羊肉', pinyin: 'yáng ròu', meaning: 'баранина' }] },
+            { char: '鸡', pinyin: 'jī', meaning: 'курица', examples: [{ word: '鸡肉', pinyin: 'jī ròu', meaning: 'куриное мясо' }] },
+            { char: '鸭', pinyin: 'yā', meaning: 'утка', examples: [{ word: '鸭子', pinyin: 'yā zi', meaning: 'утка' }] },
+            { char: '猪', pinyin: 'zhū', meaning: 'свинья', examples: [{ word: '猪肉', pinyin: 'zhū ròu', meaning: 'свинина' }] },
+            { char: '龙', pinyin: 'lóng', meaning: 'дракон', examples: [{ word: '龙', pinyin: 'lóng', meaning: 'дракон' }] },
+            { char: '虫', pinyin: 'chóng', meaning: 'насекомое', examples: [{ word: '虫子', pinyin: 'chóng zi', meaning: 'насекомое' }] }
+        ]
+    },
 
+    colors: {
+        name: "🎨 Цвета",
+        description: "Краски мира",
+        group: "topic",
+        items: [
+            { char: '红', pinyin: 'hóng', meaning: 'красный', examples: [{ word: '红色', pinyin: 'hóng sè', meaning: 'красный цвет' }] },
+            { char: '黄', pinyin: 'huáng', meaning: 'жёлтый', examples: [{ word: '黄色', pinyin: 'huáng sè', meaning: 'жёлтый цвет' }] },
+            { char: '蓝', pinyin: 'lán', meaning: 'синий', examples: [{ word: '蓝色', pinyin: 'lán sè', meaning: 'синий цвет' }] },
+            { char: '绿', pinyin: 'lǜ', meaning: 'зелёный', examples: [{ word: '绿色', pinyin: 'lǜ sè', meaning: 'зелёный цвет' }] },
+            { char: '白', pinyin: 'bái', meaning: 'белый', examples: [{ word: '白色', pinyin: 'bái sè', meaning: 'белый цвет' }] },
+            { char: '黑', pinyin: 'hēi', meaning: 'чёрный', examples: [{ word: '黑色', pinyin: 'hēi sè', meaning: 'чёрный цвет' }] }
+        ]
+    },
+
+    body: {
+        name: "🧍 Тело",
+        description: "Части тела",
+        group: "topic",
+        items: [
+            { char: '身', pinyin: 'shēn', meaning: 'тело', examples: [{ word: '身体', pinyin: 'shēn tǐ', meaning: 'здоровье' }] },
+            { char: '体', pinyin: 'tǐ', meaning: 'форма', examples: [{ word: '身体', pinyin: 'shēn tǐ', meaning: 'здоровье' }] },
+            { char: '头', pinyin: 'tóu', meaning: 'голова', examples: [{ word: '头发', pinyin: 'tóu fa', meaning: 'волосы' }] },
+            { char: '手', pinyin: 'shǒu', meaning: 'рука', examples: [{ word: '手机', pinyin: 'shǒu jī', meaning: 'телефон' }] },
+            { char: '眼', pinyin: 'yǎn', meaning: 'глаз', examples: [{ word: '眼睛', pinyin: 'yǎn jing', meaning: 'глаза' }] },
+            { char: '口', pinyin: 'kǒu', meaning: 'рот', examples: [{ word: '门口', pinyin: 'mén kǒu', meaning: 'у двери' }] },
+            { char: '耳', pinyin: 'ěr', meaning: 'ухо', examples: [{ word: '耳朵', pinyin: 'ěr duo', meaning: 'уши' }] },
+            { char: '心', pinyin: 'xīn', meaning: 'сердце', examples: [{ word: '开心', pinyin: 'kāi xīn', meaning: 'радостный' }] },
+            { char: '脚', pinyin: 'jiǎo', meaning: 'стопа', examples: [{ word: '脚步', pinyin: 'jiǎo bù', meaning: 'шаг' }] },
+            { char: '牙', pinyin: 'yá', meaning: 'зуб', examples: [{ word: '牙齿', pinyin: 'yá chǐ', meaning: 'зубы' }] },
+            { char: '发', pinyin: 'fà', meaning: 'волосы', examples: [{ word: '头发', pinyin: 'tóu fa', meaning: 'волосы' }] },
+            { char: '鼻', pinyin: 'bí', meaning: 'нос', examples: [{ word: '鼻子', pinyin: 'bí zi', meaning: 'нос' }] }
+        ]
+    }
+};
 
 
 // ============================================================
