@@ -1221,6 +1221,39 @@ const HanziDB = {
         return HANZI_DATABASE[categoryKey]?.items || [];
     },
     
+    // 🆕 УМНАЯ ФУНКЦИЯ: получить уникальные иероглифы категории
+    // Автоматически убирает дубликаты из предыдущих уровней HSK
+    getUniqueCategory: function(categoryKey) {
+        const items = this.getCategory(categoryKey);
+        
+        // Если это не уровень HSK — возвращаем как есть
+        if (categoryKey !== 'hsk2_all' && categoryKey !== 'hsk3_all') {
+            return items;
+        }
+        
+        // Собираем все иероглифы из предыдущих уровней
+        const previousChars = new Set();
+        
+        if (categoryKey === 'hsk2_all') {
+            // Для HSK 2 убираем всё из HSK 1
+            const hsk1Items = this.getCategory('hsk1_all');
+            hsk1Items.forEach(item => previousChars.add(item.char));
+        } else if (categoryKey === 'hsk3_all') {
+            // Для HSK 3 убираем всё из HSK 1 и HSK 2
+            const hsk1Items = this.getCategory('hsk1_all');
+            const hsk2Items = this.getCategory('hsk2_all');
+            hsk1Items.forEach(item => previousChars.add(item.char));
+            hsk2Items.forEach(item => previousChars.add(item.char));
+        }
+        
+        // Фильтруем: оставляем только уникальные иероглифы
+        const unique = items.filter(item => !previousChars.has(item.char));
+        
+        console.log(`🔍 ${categoryKey}: было ${items.length}, стало ${unique.length} (убрано ${items.length - unique.length} дубликатов)`);
+        
+        return unique;
+    },
+    
     getCategories: function() {
         return Object.keys(HANZI_DATABASE).map(key => ({
             key,
@@ -1323,6 +1356,7 @@ const HanziDB = {
         };
     }
 };
+
 
 // ============================================================
 // 📊 СИСТЕМА ПРОГРЕССА И ИНТЕРВАЛЬНОГО ПОВТОРЕНИЯ
