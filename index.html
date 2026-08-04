@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>漢字 · Каллиграфия</title>
 
-    <meta name="description" content="Тренажёр китайской каллиграфии с примерами слов и озвучкой">
+    <!-- PWA: Мета-теги -->
+    <meta name="description" content="Тренажёр китайской каллиграфии с озвучкой и распознаванием черт">
     <meta name="theme-color" content="#1e1a17">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,6 +15,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="icon.svg">
 
+    <!-- Шрифты и библиотека -->
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5.0/dist/hanzi-writer.min.js"></script>
     <script src="hanzi-db.js"></script>
@@ -45,110 +47,68 @@
         .game-container {
             background: var(--paper-color);
             background-image: radial-gradient(circle at 20% 30%, #fdfaf5 0%, #efe6d8 100%);
-            padding: 0.8rem 1rem 1rem;
+            padding: 1rem;
             border-radius: 2rem;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 0 2px #b8a58b inset;
             width: 100%;
             max-width: 500px;
             display: flex;
             flex-direction: column;
-            gap: 0.7rem;
+            gap: 0.8rem;
             position: relative;
         }
 
-        /* Верхняя панель */
-        .hero-panel {
-            background: linear-gradient(135deg, #fffaf0 0%, #f5ead8 100%);
-            border-radius: 1.5rem;
-            padding: 1rem 1.2rem;
-            box-shadow: 0 4px 0 #d6c4b0, 0 8px 20px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-            position: relative;
-            border: 2px solid #e8dcc4;
-        }
-        .hero-panel:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 0 #d6c4b0;
-        }
-        .hero-panel::after {
-            content: '🔊';
-            position: absolute;
-            top: 0.6rem;
-            right: 0.8rem;
-            font-size: 1.1rem;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-        .hero-panel:hover::after { opacity: 0.9; }
-
-        .hero-top-row {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.3rem;
-        }
-        .hero-char {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: clamp(3rem, 12vw, 4.5rem);
-            color: var(--ink-color);
-            line-height: 1;
-            transition: color 0.3s;
-            flex-shrink: 0;
-        }
-        .hero-meta {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 0.25rem;
-            min-width: 0;
-        }
-        .hero-pinyin {
-            font-size: clamp(1.3rem, 5vw, 1.8rem);
-            color: #8a4a2a;
-            font-weight: 700;
-            line-height: 1.1;
-            letter-spacing: 0.5px;
-        }
-        .hero-meaning {
-            font-size: clamp(1rem, 3.5vw, 1.3rem);
-            color: #4a6a4a;
-            font-weight: 600;
-            line-height: 1.2;
-        }
-        .hero-bottom-row {
+        /* Верхняя панель (кликабельная для озвучки) */
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px dashed #d6c4b0;
-            margin-top: 0.3rem;
-            flex-wrap: wrap;
         }
-        .hero-streak {
-            display: inline-flex;
+        .char-info {
+            display: flex;
             align-items: center;
-            gap: 0.3rem;
-            background: linear-gradient(135deg, #ff9f1c, #ff6b6b);
-            color: white;
-            padding: 0.25rem 0.7rem;
+            gap: 0.6rem;
+            flex: 1;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+            position: relative;
+            padding: 0.2rem;
             border-radius: 1rem;
-            font-size: 0.85rem;
-            font-weight: 700;
-            box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
         }
-        .hero-category {
-            font-size: 0.8rem;
-            color: #6a5a4a;
-            font-weight: 600;
+        .char-info:active {
+            transform: scale(0.96);
+            background: rgba(0,0,0,0.03);
         }
-        .hero-menu-btn {
+        .char-info::after {
+            content: '🔊';
+            font-size: 1rem;
+            opacity: 0.4;
+            margin-left: 0.3rem;
+            transition: opacity 0.2s;
+        }
+        .char-info:hover::after { opacity: 0.8; }
+
+        .char-main {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: clamp(2rem, 7vw, 3rem);
+            color: var(--ink-color);
+            line-height: 1;
+            transition: color 0.3s;
+        }
+        .char-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+        .pinyin { color: #8a4a2a; font-weight: 700; font-size: 0.95rem; }
+        .meaning { color: #4a6a4a; font-weight: 600; font-size: 0.85rem; }
+        
+        .category-btn {
             background: #dacfc1;
             border: none;
-            border-radius: 0.8rem;
-            padding: 0.4rem 0.9rem;
+            border-radius: 1rem;
+            padding: 0.5rem 0.8rem;
             font-size: 0.85rem;
             font-weight: 700;
             color: var(--ink-color);
@@ -156,7 +116,7 @@
             cursor: pointer;
             transition: all 0.1s;
         }
-        .hero-menu-btn:active {
+        .category-btn:active {
             transform: translateY(3px);
             box-shadow: 0 0 0 #aa9884;
         }
@@ -173,15 +133,26 @@
             overflow: hidden;
             transition: transform 0.1s;
         }
-        .writer-wrapper.shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        .writer-wrapper.shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
         @keyframes shake {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
             20%, 80% { transform: translate3d(2px, 0, 0); }
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
-        #hw-container { width: 100%; height: 100%; border-radius: 1rem; position: relative; }
-        #hw-container svg { width: 100% !important; height: 100% !important; display: block; }
+        #hw-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+            position: relative;
+        }
+        #hw-container svg {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
 
         .instruction {
             text-align: center;
@@ -191,26 +162,7 @@
             min-height: 1.2em;
         }
 
-        .char-status {
-            position: absolute;
-            top: 0.7rem;
-            right: 0.7rem;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 0.6rem;
-            font-weight: 700;
-            z-index: 10;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-        .char-status.new { background: #d6c4b0; color: #5a4a3a; }
-        .char-status.learning { background: #ffd166; color: #2a1a0a; }
-        .char-status.due { background: #ff6b6b; color: white; animation: pulse 1.5s infinite; }
-        .char-status.mastered { background: #4CD964; color: white; }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-
+        /* Прогресс */
         .stroke-progress {
             width: 100%;
             height: 8px;
@@ -225,6 +177,7 @@
             transition: width 0.3s ease-out;
         }
 
+        /* Статистика */
         .stats-bar {
             display: flex;
             justify-content: space-between;
@@ -235,12 +188,6 @@
             font-weight: 700;
             font-size: 0.9rem;
             color: #3d3229;
-            gap: 0.5rem;
-        }
-        .stats-bar-item {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
         }
         .combo-badge {
             background: var(--accent-gold);
@@ -252,9 +199,16 @@
             transform: scale(0.8);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .combo-badge.active { opacity: 1; transform: scale(1); }
+        .combo-badge.active {
+            opacity: 1;
+            transform: scale(1);
+        }
 
-        .controls { display: flex; gap: 0.6rem; }
+        /* Кнопки */
+        .controls {
+            display: flex;
+            gap: 0.6rem;
+        }
         .btn {
             flex: 1;
             background: #dacfc1;
@@ -272,12 +226,12 @@
             align-items: center;
             gap: 0.4rem;
         }
-        .btn:active { transform: translateY(4px); box-shadow: 0 0 0 #aa9884; }
+        .btn:active { transform: translateY(4px); box-shadow: 0 0px 0 #aa9884; }
         .btn:disabled { opacity: 0.5; pointer-events: none; }
         .btn-primary { background: #c9b39b; box-shadow: 0 4px 0 #8e7b66; }
-        .btn-hint { background: #8fb88a; color: #1f2a1c; box-shadow: 0 4px 0 #5f7a5a; flex: 0.5; }
-        .btn-examples { background: #b8a8d8; color: #2a1a3a; box-shadow: 0 4px 0 #8a7aa8; flex: 0.5; }
+        .btn-hint { background: #8fb88a; color: #1f2a1c; box-shadow: 0 4px 0 #5f7a5a; flex: 0.6; }
 
+        /* Всплывающий текст */
         .floating-text {
             position: absolute;
             top: 50%; left: 50%;
@@ -317,66 +271,7 @@
         }
         .modal h2 { font-size: 1.2rem; color: var(--ink-color); margin-bottom: 0.8rem; text-align: center; }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            margin-bottom: 0.8rem;
-        }
-        .stat-card {
-            background: #ede3d6;
-            border-radius: 0.8rem;
-            padding: 0.6rem;
-            text-align: center;
-        }
-        .stat-card-value {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--ink-color);
-            line-height: 1;
-        }
-        .stat-card-label {
-            font-size: 0.7rem;
-            color: #6a5a4a;
-            margin-top: 0.2rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .stat-card.highlight {
-            background: linear-gradient(135deg, #d4a84a, #c9953a);
-            color: #2a1a0a;
-        }
-        .stat-card.highlight .stat-card-value,
-        .stat-card.highlight .stat-card-label { color: #2a1a0a; }
-
-        .mode-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
-            margin-bottom: 0.8rem;
-        }
-        .mode-btn {
-            background: #ede3d6;
-            border: 2px solid transparent;
-            border-radius: 0.9rem;
-            padding: 0.7rem 0.5rem;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--ink-color);
-        }
-        .mode-btn:active { transform: scale(0.97); }
-        .mode-btn:hover { background: #e4d8c4; }
-        .mode-btn-icon { font-size: 1.5rem; display: block; margin-bottom: 0.2rem; }
-        .mode-btn-desc {
-            font-size: 0.7rem;
-            color: #6a5a4a;
-            font-weight: 400;
-            margin-top: 0.15rem;
-        }
-
+        /* Поиск */
         .search-wrapper { position: relative; margin-bottom: 0.8rem; }
         .search-input {
             width: 100%; padding: 0.7rem 2.5rem 0.7rem 2.5rem;
@@ -417,6 +312,7 @@
         .category-item-name { font-weight: 700; font-size: 1rem; color: var(--ink-color); }
         .category-item-desc { font-size: 0.78rem; color: #6a5a4a; margin-top: 0.15rem; }
 
+        /* Результаты поиска */
         .search-results { display: flex; flex-direction: column; gap: 0.4rem; }
         .search-result-item {
             background: #fcf8f0; border: 1px solid #e0d4c0; border-radius: 0.9rem;
@@ -439,185 +335,31 @@
         }
         .modal-close:active { transform: translateY(4px); box-shadow: 0 0 0 #8e7b66; }
 
-        /* Модальное окно примеров */
-        .examples-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: none; justify-content: center; align-items: center;
-            z-index: 1001; padding: 1rem; backdrop-filter: blur(6px);
-        }
-        .examples-modal.show { display: flex; }
-        .examples-content {
-            background: var(--paper-color);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            max-width: 400px; width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-            max-height: 80vh;
-            display: flex; flex-direction: column;
-        }
-        .examples-header {
-            text-align: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 2px dashed #d6c4b0;
-        }
-        .examples-char {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 3rem;
-            color: var(--ink-color);
-            line-height: 1;
-        }
-        .examples-pinyin {
-            font-size: 1.2rem;
-            color: #8a4a2a;
-            font-weight: 700;
-            margin-top: 0.3rem;
-        }
-        .examples-meaning {
-            font-size: 1rem;
-            color: #4a6a4a;
-            font-weight: 600;
-            margin-top: 0.2rem;
-        }
-        .examples-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-        .example-item {
-            background: #fcf8f0;
-            border: 2px solid #e0d4c0;
-            border-radius: 1rem;
-            padding: 0.8rem;
-            cursor: pointer;
-            transition: all 0.15s;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        .example-item:active {
-            transform: scale(0.98);
-            background: #f5ead8;
-            border-color: var(--accent-gold);
-        }
-        .example-word {
-            font-family: 'Ma Shan Zheng', cursive;
-            font-size: 2rem;
-            color: var(--ink-color);
-            line-height: 1;
-            min-width: 3rem;
-            text-align: center;
-        }
-        .example-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.15rem;
-        }
-        .example-pinyin {
-            font-weight: 700;
-            color: #8a4a2a;
-            font-size: 0.95rem;
-        }
-        .example-meaning {
-            color: #4a6a4a;
-            font-size: 0.85rem;
-        }
-        .example-speak {
-            font-size: 1.5rem;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-        .example-item:hover .example-speak {
-            opacity: 1;
-        }
-        .examples-empty {
-            text-align: center;
-            padding: 2rem 1rem;
-            color: #8a7a6a;
-            font-size: 0.9rem;
-        }
-
         .firework-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
-        
         @media (max-width: 400px) {
             .modal { padding: 1rem; }
             .search-result-char { font-size: 1.7rem; min-width: 1.8rem; }
-            .hero-panel { padding: 0.8rem 1rem; }
-            .hero-char { font-size: 3rem; }
-            .hero-pinyin { font-size: 1.3rem; }
-            .hero-meaning { font-size: 1rem; }
         }
-        /* === БЛОК ПРОГРЕССА ИЗУЧЕНИЯ === */
-.mastery-block {
-    background: #fcf8f0;
-    border: 2px solid #e0d4c0;
-    border-radius: 1rem;
-    padding: 1rem;
-    margin-top: 1rem;
-    text-align: center;
-}
-.mastery-stars {
-    font-size: 1.8rem;
-    letter-spacing: 2px;
-    margin-bottom: 0.5rem;
-}
-.star-filled { color: #D4A840; text-shadow: 0 2px 4px rgba(212, 168, 64, 0.3); }
-.star-empty { color: #d6c4b0; }
-
-.mastery-bar-bg {
-    width: 100%;
-    height: 12px;
-    background: #e0d4c0;
-    border-radius: 6px;
-    overflow: hidden;
-    margin: 0.5rem 0;
-}
-.mastery-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4CD964, #D4A840);
-    border-radius: 6px;
-    transition: width 0.5s ease-out;
-}
-.mastery-text {
-    font-size: 0.85rem;
-    color: #6a5a4a;
-    font-weight: 600;
-}
-.mastery-text.mastered {
-    color: #4CD964;
-    font-size: 1rem;
-    font-weight: 800;
-}
-
-
     </style>
 </head>
 <body>
 
 <div class="game-container">
-    <div class="hero-panel" id="heroPanel">
-        <div class="hero-top-row">
-            <div class="hero-char" id="charDisplay">永</div>
-            <div class="hero-meta">
-                <div class="hero-pinyin" id="pinyinDisplay">yǒng</div>
-                <div class="hero-meaning" id="meaningDisplay">вечный</div>
+    <div class="top-bar">
+        <!-- Кликабельная область для озвучки -->
+        <div class="char-info" id="charInfo">
+            <div class="char-main" id="charDisplay">永</div>
+            <div class="char-meta">
+                <span class="pinyin" id="pinyinDisplay">yǒng</span>
+                <span class="meaning" id="meaningDisplay">вечный</span>
             </div>
         </div>
-        <div class="hero-bottom-row">
-            <div class="hero-streak" id="heroStreak">🔥 0 дней</div>
-            <div class="hero-category" id="heroCategory">📚 HSK 1</div>
-            <button class="hero-menu-btn" id="categoryBtn">📚 Меню</button>
-        </div>
+        <button class="category-btn" id="categoryBtn">📚 Меню</button>
     </div>
 
     <div class="instruction" id="instructionText">✍️ Обведите иероглиф по порядку черт</div>
 
     <div class="writer-wrapper" id="writerWrapper">
-        <div class="char-status new" id="charStatus">✨ НОВЫЙ</div>
         <div id="hw-container"></div>
         <div class="floating-text" id="floatingText"></div>
     </div>
@@ -627,61 +369,25 @@
     </div>
 
     <div class="stats-bar">
-        <div class="stats-bar-item">⭐ <span id="scoreDisplay">0</span></div>
-        <div class="stats-bar-item">🎯 <span id="accuracyDisplay">0%</span></div>
+        <div>⭐ <span id="scoreDisplay">0</span></div>
         <div class="combo-badge" id="comboBadge">🔥 x<span id="comboDisplay">0</span></div>
     </div>
 
     <div class="controls">
-        <button class="btn btn-hint" id="hintBtn">👁️</button>
-        <button class="btn btn-examples" id="examplesBtn">📖 Примеры</button>
-        <button class="btn btn-primary" id="nextBtn">⏭️</button>
+        <button class="btn btn-hint" id="hintBtn">👁️ Подсказка</button>
+        <button class="btn btn-primary" id="nextBtn">Следующий ⏭️</button>
     </div>
 </div>
 
-<!-- Модальное окно категорий -->
+<!-- Модальное окно -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
         <h2>📚 Иероглифы</h2>
-        
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card highlight">
-                <div class="stat-card-value" id="statStreak">0 🔥</div>
-                <div class="stat-card-label">Серия дней</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-value" id="statMastered">0</div>
-                <div class="stat-card-label">Выучено</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-value" id="statAccuracy">0%</div>
-                <div class="stat-card-label">Точность</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-value" id="statDue">0</div>
-                <div class="stat-card-label">Пора повторить</div>
-            </div>
-        </div>
-        
-        <div class="mode-buttons">
-            <div class="mode-btn" id="modeDue">
-                <span class="mode-btn-icon">🔄</span>
-                Повторение
-                <div class="mode-btn-desc">Только те, что пора</div>
-            </div>
-            <div class="mode-btn" id="modeWeak">
-                <span class="mode-btn-icon">🎯</span>
-                Слабые места
-                <div class="mode-btn-desc">Где были ошибки</div>
-            </div>
-        </div>
-        
         <div class="search-wrapper">
             <span class="search-icon">🔍</span>
             <input type="text" id="searchInput" class="search-input" placeholder="Поиск: 水, shuǐ, вода..." autocomplete="off" autocapitalize="off" spellcheck="false">
             <button class="search-clear" id="searchClear" title="Очистить">✕</button>
         </div>
-        
         <div class="modal-scroll" id="modalScroll">
             <div id="categoriesView"></div>
             <div id="searchView" style="display:none;"></div>
@@ -690,24 +396,11 @@
     </div>
 </div>
 
-<!-- Модальное окно примеров -->
-<div class="examples-modal" id="examplesModal">
-    <div class="examples-content">
-        <div class="examples-header">
-            <div class="examples-char" id="examplesChar">水</div>
-            <div class="examples-pinyin" id="examplesPinyin">shuǐ</div>
-            <div class="examples-meaning" id="examplesMeaning">вода</div>
-        </div>
-        <div class="examples-list" id="examplesList"></div>
-        <button class="modal-close" id="examplesClose">Закрыть</button>
-    </div>
-</div>
-
 <div id="fireworkContainer" class="firework-container"></div>
 
 <script>
+    // === СОСТОЯНИЕ ===
     let currentCategory = 'basic';
-    let currentCategoryName = '📚 HSK 1';
     let currentItems = [];
     let currentIndex = 0;
     let score = 0;
@@ -719,18 +412,15 @@
     let isShowingHint = false;
     let isSingleMode = false;
 
-    const heroPanel = document.getElementById('heroPanel');
+    // === DOM ===
+    const charInfo = document.getElementById('charInfo');
     const charDisplay = document.getElementById('charDisplay');
     const pinyinDisplay = document.getElementById('pinyinDisplay');
     const meaningDisplay = document.getElementById('meaningDisplay');
-    const heroStreak = document.getElementById('heroStreak');
-    const heroCategory = document.getElementById('heroCategory');
-    const charStatus = document.getElementById('charStatus');
     const instructionText = document.getElementById('instructionText');
     const writerWrapper = document.getElementById('writerWrapper');
     const hwContainer = document.getElementById('hw-container');
     const scoreDisplay = document.getElementById('scoreDisplay');
-    const accuracyDisplay = document.getElementById('accuracyDisplay');
     const comboDisplay = document.getElementById('comboDisplay');
     const comboBadge = document.getElementById('comboBadge');
     const progressFill = document.getElementById('progressFill');
@@ -741,19 +431,8 @@
     const searchInput = document.getElementById('searchInput');
     const searchClear = document.getElementById('searchClear');
     const hintBtn = document.getElementById('hintBtn');
-    const examplesBtn = document.getElementById('examplesBtn');
-    const examplesModal = document.getElementById('examplesModal');
-    const examplesChar = document.getElementById('examplesChar');
-    const examplesPinyin = document.getElementById('examplesPinyin');
-    const examplesMeaning = document.getElementById('examplesMeaning');
-    const examplesList = document.getElementById('examplesList');
-    const statStreak = document.getElementById('statStreak');
-    const statMastered = document.getElementById('statMastered');
-    const statAccuracy = document.getElementById('statAccuracy');
-    const statDue = document.getElementById('statDue');
-    const modeDue = document.getElementById('modeDue');
-    const modeWeak = document.getElementById('modeWeak');
 
+    // === АУДИО И ОЗВУЧКА ===
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -792,15 +471,18 @@
         }
     }
 
+    // 🔊 НОВАЯ ФУНКЦИЯ: Озвучка иероглифа и перевода
     function speakCharacter(char, meaning) {
         if (!('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel();
+
         const queue = [
-            { text: char, lang: 'zh-CN', rate: 0.7 },
-            { text: char, lang: 'zh-CN', rate: 0.7 },
-            { text: meaning, lang: 'ru-RU', rate: 1.0 }
+            { text: char, lang: 'zh-CN', rate: 0.7 },  // Медленно и чётко
+            { text: char, lang: 'zh-CN', rate: 0.7 },  // Повтор
+            { text: meaning, lang: 'ru-RU', rate: 1.0 } // Перевод
         ];
         let index = 0;
+
         function speakNext() {
             if (index >= queue.length) return;
             const item = queue[index];
@@ -808,6 +490,7 @@
             utterance.lang = item.lang;
             utterance.rate = item.rate;
             utterance.volume = 1.0;
+
             utterance.onend = () => { index++; setTimeout(speakNext, 400); };
             utterance.onerror = () => { index++; setTimeout(speakNext, 400); };
             window.speechSynthesis.speak(utterance);
@@ -815,16 +498,7 @@
         speakNext();
     }
 
-    function speakWord(word) {
-        if (!('speechSynthesis' in window)) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'zh-CN';
-        utterance.rate = 0.8;
-        utterance.volume = 1.0;
-        window.speechSynthesis.speak(utterance);
-    }
-
+    // === ВИЗУАЛЬНЫЕ ЭФФЕКТЫ ===
     function showFloatingText(text) {
         floatingText.textContent = text;
         floatingText.classList.remove('show');
@@ -849,42 +523,10 @@
         }
     }
 
+    // === РАЗМЕР И ЗАГРУЗКА ===
     function getWriterSize() {
         const rect = hwContainer.getBoundingClientRect();
         return Math.max(200, Math.floor(Math.min(rect.width, rect.height)));
-    }
-
-    function updateCharStatus() {
-        if (currentItems.length === 0) return;
-        const data = currentItems[currentIndex];
-        const progress = HanziProgress.get(data.char);
-        
-        charStatus.classList.remove('new', 'learning', 'due', 'mastered');
-        
-        if (progress.mastered) {
-            charStatus.classList.add('mastered');
-            charStatus.textContent = '✓ ВЫУЧЕН';
-        } else if (progress.attempts > 0 && progress.nextReview <= Date.now()) {
-            charStatus.classList.add('due');
-            charStatus.textContent = '🔄 ПОВТОРИТЬ';
-        } else if (progress.attempts > 0) {
-            charStatus.classList.add('learning');
-            charStatus.textContent = '📖 ИЗУЧАЕМ';
-        } else {
-            charStatus.classList.add('new');
-            charStatus.textContent = '✨ НОВЫЙ';
-        }
-    }
-
-    function updateStats() {
-        const stats = HanziProgress.getStats();
-        const streakText = `${stats.streak} 🔥`;
-        statStreak.textContent = streakText;
-        heroStreak.textContent = `${stats.streak} 🔥 дней`;
-        statMastered.textContent = stats.mastered;
-        statAccuracy.textContent = `${stats.accuracy}%`;
-        accuracyDisplay.textContent = `${stats.accuracy}%`;
-        statDue.textContent = stats.dueCount;
     }
 
     function loadCharacter(index) {
@@ -900,8 +542,6 @@
         hintBtn.style.opacity = '1';
         
         updateProgress(0);
-        updateCharStatus();
-        
         instructionText.textContent = "✍️ Обведите иероглиф по порядку черт";
         instructionText.style.color = "#6a5a4a";
 
@@ -913,8 +553,9 @@
             height: size,
             padding: 15,
             showOutline: true,
-            strokeAnimationSpeed: 1.2,
-            delayBetweenStrokes: 500,
+            // 🐌 МЕДЛЕННАЯ И ПЛАВНАЯ АНИМАЦИЯ ДЛЯ ОБУЧЕНИЯ
+            strokeAnimationSpeed: 1.2,   // Было 2.5
+            delayBetweenStrokes: 500,    // Было 200
             drawingWidth: Math.max(15, size * 0.06),
             showCharacter: false,
             highlightColor: '#FF3B30',
@@ -955,16 +596,6 @@
                 launchFirework();
                 score += 100;
                 const accuracy = summaryData.totalMistakes === 0 ? 100 : Math.max(0, Math.round((1 - summaryData.totalMistakes / currentStrokesTotal) * 100));
-                
-                if (summaryData.totalMistakes === 0) {
-                    HanziProgress.recordSuccess(data.char, accuracy);
-                } else {
-                    HanziProgress.recordMistake(data.char, summaryData.totalMistakes);
-                }
-                
-                updateCharStatus();
-                updateStats();
-                
                 showFloatingText(accuracy === 100 ? '💯 Идеально!' : `✅ Готово! (${accuracy}%)`);
                 
                 if (isSingleMode) {
@@ -988,7 +619,6 @@
     
     function nextCharacter() {
         if (isSingleMode) {
-            updateStats();
             updateCategoryList();
             modalOverlay.classList.add('show');
             setTimeout(() => searchInput.focus(), 100);
@@ -1000,10 +630,6 @@
 
     function loadCategory(categoryKey) {
         currentCategory = categoryKey;
-        const cat = HANZI_DATABASE[categoryKey];
-        currentCategoryName = cat ? cat.name : '📚 Иероглифы';
-        heroCategory.textContent = currentCategoryName;
-        
         currentItems = HanziDB.shuffle(HanziDB.getCategory(categoryKey));
         currentIndex = 0;
         isSingleMode = false;
@@ -1015,8 +641,6 @@
 
     function loadSingleChar(charData) {
         currentCategory = null;
-        currentCategoryName = '🔍 Поиск';
-        heroCategory.textContent = currentCategoryName;
         currentItems = [charData];
         currentIndex = 0;
         isSingleMode = true;
@@ -1025,10 +649,12 @@
         localStorage.removeItem('hanzi_category');
     }
 
+    // === ПОДСКАЗКА (с озвучкой) ===
     function showHint() {
         if (!hwWriter || isShowingHint) return;
         initAudio();
         
+        // 🔊 Озвучиваем при показе подсказки
         if (currentItems.length > 0) {
             const data = currentItems[currentIndex];
             speakCharacter(data.char, data.meaning);
@@ -1051,115 +677,7 @@
         });
     }
 
-        function showExamples() {
-        if (currentItems.length === 0) return;
-        const data = currentItems[currentIndex];
-        
-        // Получаем расширенные данные о прогрессе
-        const progress = HanziProgress.get(data.char);
-        
-        examplesChar.textContent = data.char;
-        examplesPinyin.textContent = data.pinyin;
-        examplesMeaning.textContent = data.meaning;
-        
-        examplesList.innerHTML = '';
-        
-        // 🆕 БЛОК ПРОГРЕССА (Звёзды и полоска)
-        const progressBlock = document.createElement('div');
-        progressBlock.className = 'mastery-block';
-        
-        // Генерируем звёзды (например: ★★★☆☆)
-        let starsHtml = '';
-        for (let i = 1; i <= 5; i++) {
-            starsHtml += i <= progress.stars ? '<span class="star-filled">★</span>' : '<span class="star-empty">☆</span>';
-        }
-        
-        const isMastered = progress.isMastered;
-        const progressText = isMastered 
-            ? '🎉 Иероглиф полностью выучен!' 
-            : `Прогресс: ${progress.masteryProgress}% (осталось ${progress.levelsRemaining} ур. и ${progress.successesRemaining} усп.)`;
-        
-        progressBlock.innerHTML = `
-            <div class="mastery-stars">${starsHtml}</div>
-            <div class="mastery-bar-bg">
-                <div class="mastery-bar-fill" style="width: ${progress.masteryProgress}%"></div>
-            </div>
-            <div class="mastery-text ${isMastered ? 'mastered' : ''}">${progressText}</div>
-        `;
-        examplesList.appendChild(progressBlock);
-        
-        // Примеры слов (если есть)
-        if (data.examples && data.examples.length > 0) {
-            const examplesHeader = document.createElement('div');
-            examplesHeader.style.cssText = 'font-size: 0.85rem; color: #6a5a4a; font-weight: 700; margin: 1rem 0 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;';
-            examplesHeader.textContent = '📖 Примеры слов:';
-            examplesList.appendChild(examplesHeader);
-
-            data.examples.forEach(ex => {
-                const item = document.createElement('div');
-                item.className = 'example-item';
-                item.innerHTML = `
-                    <div class="example-word">${ex.word}</div>
-                    <div class="example-info">
-                        <div class="example-pinyin">${ex.pinyin}</div>
-                        <div class="example-meaning">${ex.meaning}</div>
-                    </div>
-                    <div class="example-speak">🔊</div>
-                `;
-                item.addEventListener('click', () => {
-                    initAudio();
-                    speakWord(ex.word);
-                    item.style.background = '#f5ead8';
-                    setTimeout(() => { item.style.background = ''; }, 300);
-                });
-                examplesList.appendChild(item);
-            });
-        } else {
-            const emptyMsg = document.createElement('div');
-            emptyMsg.className = 'examples-empty';
-            emptyMsg.textContent = '📖 Примеры слов для этого иероглифа пока не добавлены';
-            examplesList.appendChild(emptyMsg);
-        }
-        
-        examplesModal.classList.add('show');
-    }
-
-
-
-    function startDueReview() {
-        const due = HanziProgress.getDueForReview();
-        if (due.length === 0) {
-            showFloatingText('🎉 Всё повторено!');
-            return;
-        }
-        currentCategory = 'due';
-        currentCategoryName = '🔄 Повторение';
-        heroCategory.textContent = currentCategoryName;
-        currentItems = due;
-        currentIndex = 0;
-        isSingleMode = false;
-        loadCharacter(0);
-        modalOverlay.classList.remove('show');
-        showFloatingText('🔄 Режим повторения');
-    }
-
-    function startWeakSpots() {
-        const weak = HanziProgress.getWeakSpots();
-        if (weak.length === 0) {
-            showFloatingText('✨ Нет слабых мест!');
-            return;
-        }
-        currentCategory = 'weak';
-        currentCategoryName = '🎯 Слабые места';
-        heroCategory.textContent = currentCategoryName;
-        currentItems = weak;
-        currentIndex = 0;
-        isSingleMode = false;
-        loadCharacter(0);
-        modalOverlay.classList.remove('show');
-        showFloatingText('🎯 Слабые места');
-    }
-
+    // === ПОИСК ===
     function performSearch(query) {
         query = query.trim().toLowerCase();
         searchView.innerHTML = '';
@@ -1203,6 +721,7 @@
                 modalOverlay.classList.remove('show');
                 loadSingleChar(item);
                 showFloatingText(`📖 ${item.char} · ${item.pinyin}`);
+                // Автоматически озвучиваем при выборе из поиска
                 setTimeout(() => speakCharacter(item.char, item.meaning), 300);
             });
             list.appendChild(el);
@@ -1216,6 +735,7 @@
         return div.innerHTML;
     }
 
+    // === КАТЕГОРИИ ===
     function updateCategoryList() {
         categoriesView.innerHTML = '';
         const groups = HanziDB.getCategoriesByGroup();
@@ -1253,8 +773,9 @@
         return item;
     }
 
-    heroPanel.addEventListener('click', (e) => {
-        if (e.target.closest('#categoryBtn')) return;
+    // === ОБРАБОТЧИКИ ===
+    // 🔊 Клик по иероглифу для озвучки
+    charInfo.addEventListener('click', () => {
         initAudio();
         if (currentItems.length > 0) {
             const data = currentItems[currentIndex];
@@ -1266,11 +787,8 @@
 
     document.getElementById('nextBtn').addEventListener('click', () => { initAudio(); nextCharacter(); });
     hintBtn.addEventListener('click', () => { initAudio(); showHint(); });
-    examplesBtn.addEventListener('click', () => { initAudio(); showExamples(); });
     
-    document.getElementById('categoryBtn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        updateStats();
+    document.getElementById('categoryBtn').addEventListener('click', () => {
         updateCategoryList();
         modalOverlay.classList.add('show');
         setTimeout(() => searchInput.focus(), 100);
@@ -1282,10 +800,6 @@
         performSearch('');
     });
     
-    document.getElementById('examplesClose').addEventListener('click', () => {
-        examplesModal.classList.remove('show');
-    });
-    
     modalOverlay.addEventListener('click', (e) => {
         if (e.target === modalOverlay) {
             modalOverlay.classList.remove('show');
@@ -1293,28 +807,15 @@
             performSearch('');
         }
     });
-    
-    examplesModal.addEventListener('click', (e) => {
-        if (e.target === examplesModal) {
-            examplesModal.classList.remove('show');
-        }
-    });
-
-    modeDue.addEventListener('click', startDueReview);
-    modeWeak.addEventListener('click', startWeakSpots);
 
     searchInput.addEventListener('input', (e) => performSearch(e.target.value));
     searchClear.addEventListener('click', () => { searchInput.value = ''; performSearch(''); searchInput.focus(); });
     
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            if (examplesModal.classList.contains('show')) {
-                examplesModal.classList.remove('show');
-            } else if (modalOverlay.classList.contains('show')) {
-                modalOverlay.classList.remove('show');
-                searchInput.value = '';
-                performSearch('');
-            }
+        if (e.key === 'Escape' && modalOverlay.classList.contains('show')) {
+            modalOverlay.classList.remove('show');
+            searchInput.value = '';
+            performSearch('');
         }
     });
 
@@ -1336,17 +837,16 @@
         });
     }
 
-    updateStats();
+    // === СТАРТ ===
     const savedSingle = localStorage.getItem('hanzi_single_mode');
     const savedCategory = localStorage.getItem('hanzi_category');
     if (savedSingle) {
-        try { loadSingleChar(JSON.parse(savedSingle)); } catch(e) { loadCategory('hsk1_all'); }
+        try { loadSingleChar(JSON.parse(savedSingle)); } catch(e) { loadCategory('basic'); }
     } else if (savedCategory && HANZI_DATABASE[savedCategory]) {
         loadCategory(savedCategory);
     } else {
-        loadCategory('hsk1_all');
+        loadCategory('basic');
     }
 </script>
 </body>
 </html>
-
